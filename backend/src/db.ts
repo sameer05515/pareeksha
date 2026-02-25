@@ -39,7 +39,6 @@ export async function ensureTable(): Promise<void> {
       adhaarNumber VARCHAR(20) NOT NULL DEFAULT '',
       schoolName VARCHAR(255) NOT NULL,
       \`class\` VARCHAR(50) NOT NULL,
-      course VARCHAR(255) NOT NULL,
       gender VARCHAR(50) NOT NULL,
       address TEXT NOT NULL,
       city VARCHAR(100) NOT NULL,
@@ -62,7 +61,6 @@ export type StudentRow = RowDataPacket & {
   adhaarNumber: string
   schoolName: string
   class: string
-  course: string
   gender: string
   address: string
   city: string

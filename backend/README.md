@@ -39,7 +39,7 @@ Request body (JSON) — same shape as frontend form:
 - `dateOfBirth` (required)
 - `phone`, `adhaarNumber` (optional; Aadhaar must be 12 digits if provided)
 - `schoolName`, `class` (required)
-- `course`, `gender` (required)
+- `gender` (required)
 - `address`, `city`, `state`, `pincode` (required; pincode 6 digits)
 - `guardianName` (required), `guardianPhone` (optional)
 

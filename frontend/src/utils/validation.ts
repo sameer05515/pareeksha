@@ -34,7 +34,6 @@ export function validateStudentForm(data: Partial<StudentFormData>): Record<stri
   if (!data.schoolName?.trim()) errors.schoolName = 'School name is required'
   if (!data.class?.trim()) errors.class = 'Class is required'
 
-  if (!data.course?.trim()) errors.course = 'Please select a course'
   if (!data.gender?.trim()) errors.gender = 'Please select gender'
 
   if (!data.address?.trim()) errors.address = 'Address is required'

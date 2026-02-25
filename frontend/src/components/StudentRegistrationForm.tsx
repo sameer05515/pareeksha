@@ -3,7 +3,7 @@ import { FormField } from '@/components/FormField'
 import { FormSelect } from '@/components/FormSelect'
 import { FormTextarea } from '@/components/FormTextarea'
 import type { StudentFormData } from '@/types/student'
-import { initialFormData, COURSES, GENDERS } from '@/types/student'
+import { initialFormData, GENDERS } from '@/types/student'
 import { validateStudentForm } from '@/utils/validation'
 import { registerStudent } from '@/api/students'
 import styles from './StudentRegistrationForm.module.css'
@@ -174,18 +174,6 @@ export function StudentRegistrationForm() {
             onChange={(e) => update('class', e.target.value)}
             error={errors.class}
             placeholder="e.g. 10, 12"
-            required
-          />
-        </div>
-        <div className={styles.single}>
-          <FormSelect
-            label="Course"
-            name="course"
-            value={formData.course}
-            onChange={(e) => update('course', e.target.value)}
-            error={errors.course}
-            options={COURSES}
-            placeholder="Choose course"
             required
           />
         </div>

@@ -10,7 +10,6 @@ export interface StudentRegistrationBody {
   adhaarNumber: string
   schoolName: string
   class: string
-  course: string
   gender: string
   address: string
   city: string

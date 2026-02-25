@@ -17,7 +17,6 @@ function rowToRecord(row: StudentRow): StudentRecord {
     adhaarNumber: row.adhaarNumber ?? '',
     schoolName: row.schoolName,
     class: row.class,
-    course: row.course,
     gender: row.gender,
     address: row.address,
     city: row.city,
@@ -29,7 +28,11 @@ function rowToRecord(row: StudentRow): StudentRecord {
 }
 
 export async function getAllStudents(): Promise<StudentRecord[]> {
-  const [rows] = await getPool().execute<StudentRow[]>('SELECT * FROM students ORDER BY createdAt DESC')
+  const [rows] = await getPool().execute<StudentRow[]>(
+    `SELECT id, createdAt, firstName, lastName, email, dateOfBirth, phone, adhaarNumber,
+     schoolName, \`class\`, gender, address, city, state, pincode, guardianName, guardianPhone
+     FROM students ORDER BY createdAt DESC`
+  )
   return (rows ?? []).map(rowToRecord)
 }
 
@@ -38,9 +41,9 @@ export async function addStudent(record: StudentRecord): Promise<void> {
   await getPool().execute(
     `INSERT INTO students (
       id, createdAt, firstName, lastName, email, dateOfBirth, phone, adhaarNumber,
-      schoolName, \`class\`, course, gender, address, city, state, pincode,
+      schoolName, \`class\`, gender, address, city, state, pincode,
       guardianName, guardianPhone
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       record.id,
       createdAt,
@@ -52,7 +55,6 @@ export async function addStudent(record: StudentRecord): Promise<void> {
       record.adhaarNumber,
       record.schoolName,
       record.class,
-      record.course,
       record.gender,
       record.address,
       record.city,
@@ -66,7 +68,9 @@ export async function addStudent(record: StudentRecord): Promise<void> {
 
 export async function getStudentById(id: string): Promise<StudentRecord | undefined> {
   const [rows] = await getPool().execute<StudentRow[]>(
-    'SELECT * FROM students WHERE id = ?',
+    `SELECT id, createdAt, firstName, lastName, email, dateOfBirth, phone, adhaarNumber,
+     schoolName, \`class\`, gender, address, city, state, pincode, guardianName, guardianPhone
+     FROM students WHERE id = ?`,
     [id]
   )
   const row = (rows ?? [])[0]
