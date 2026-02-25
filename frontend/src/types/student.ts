@@ -1,0 +1,51 @@
+export interface StudentFormData {
+  firstName: string
+  lastName: string
+  email: string
+  dateOfBirth: string
+  phone: string
+  adhaarNumber: string
+  schoolName: string
+  class: string
+  course: string
+  gender: string
+  address: string
+  city: string
+  state: string
+  pincode: string
+  guardianName: string
+  guardianPhone: string
+}
+
+export const initialFormData: StudentFormData = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  dateOfBirth: '',
+  phone: '',
+  adhaarNumber: '',
+  schoolName: '',
+  class: '',
+  course: '',
+  gender: '',
+  address: '',
+  city: '',
+  state: '',
+  pincode: '',
+  guardianName: '',
+  guardianPhone: '',
+}
+
+export const COURSES = [
+  'Bachelor of Science',
+  'Bachelor of Arts',
+  'Bachelor of Commerce',
+  'Engineering (B.Tech)',
+  'Medical (MBBS)',
+  'Master of Science',
+  'Master of Arts',
+  'MBA',
+  'Other',
+] as const
+
+export const GENDERS = ['Male', 'Female', 'Other', 'Prefer not to say'] as const
