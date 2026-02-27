@@ -62,6 +62,46 @@ Returns `{ success: true, student }` or `404`.
 
 `GET /health` → `{ status: 'ok' }`
 
+## API documentation (Swagger & ReDoc)
+
+- **Swagger UI:** [http://localhost:3000/api-docs](http://localhost:3000/api-docs) — interactive API explorer; you can try endpoints and add `Authorization: Bearer <token>` after logging in.
+- **ReDoc:** [http://localhost:3000/redoc](http://localhost:3000/redoc) — readable API reference.
+- **OpenAPI spec:** [http://localhost:3000/openapi.json](http://localhost:3000/openapi.json) — raw OpenAPI 3.0 JSON.
+
+## Authentication (JWT, role-based)
+
+**Roles:** `student`, `admin`, `public`
+
+- **Public** — can register (no auth).
+- **Student** — after registering, can log in and access own profile (`GET /api/students/me`).
+- **Admin** — can list all students (`GET /api/students`) and get any student by ID.
+
+### Login
+
+`POST /api/auth/login`
+
+Body: `{ "email": "...", "password": "..." }`
+
+**Success:** `200` with `{ success: true, token: "JWT...", user: { id, email, role, studentId? } }`  
+**Failure:** `401` with `{ success: false, message: "..." }`
+
+Send the token in subsequent requests: `Authorization: Bearer <token>`.
+
+### Protected routes
+
+- `GET /api/students` — **admin** only.
+- `GET /api/students/me` — **student** only (own profile).
+- `GET /api/students/:id` — **admin** (any), or **student** (own id only).
+
+### Default admin
+
+On first run, if no admin user exists, one is created:
+
+- Email: `admin@pareeksha.local` (or `ADMIN_EMAIL`)
+- Password: `admin123` (or `ADMIN_PASSWORD`)
+
+Set `JWT_SECRET` in production. See `.env.example`.
+
 ## Data
 
 Registrations are stored in a **MySQL** database named `student`.

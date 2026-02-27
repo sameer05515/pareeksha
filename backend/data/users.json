@@ -1,0 +1,9 @@
+[
+  {
+    "id": "62d15e49-01b7-42d1-9041-0d4f9618777b",
+    "email": "admin@pareeksha.local",
+    "passwordHash": "$2a$10$60bHXDvrXIHkJ0kM1C44muZQgq7mzTyZ6VCeY4kVyp4YJohxunO52",
+    "role": "admin",
+    "createdAt": "2026-02-27T12:00:04.933Z"
+  }
+]

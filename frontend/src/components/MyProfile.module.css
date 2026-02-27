@@ -1,0 +1,37 @@
+.wrapper {
+  width: 100%;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 1rem 0;
+}
+
+.profileList {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1.5rem;
+  margin: 0;
+}
+
+.profileList dt {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.profileList dd {
+  margin: 0;
+}
+
+.message,
+.error {
+  text-align: center;
+  color: var(--text-muted);
+  margin: 1.5rem 0;
+}
+
+.error {
+  color: var(--error);
+}

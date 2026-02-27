@@ -1,12 +1,30 @@
 import type { StudentFormData, StudentRecord } from '@/types/student'
+import { getAuthHeaders } from '@/api/auth'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
 export async function fetchStudents(): Promise<StudentRecord[]> {
-  const res = await fetch(`${API_BASE}/api/students`)
-  if (!res.ok) throw new Error('Failed to load students')
+  const res = await fetch(`${API_BASE}/api/students`, {
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) {
+    const err = (await res.json()) as { message?: string }
+    throw new Error(err?.message ?? 'Failed to load students')
+  }
   const json = (await res.json()) as { success: boolean; students: StudentRecord[] }
   return json.students ?? []
+}
+
+export async function fetchMyProfile(): Promise<StudentRecord> {
+  const res = await fetch(`${API_BASE}/api/students/me`, {
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) {
+    const err = (await res.json()) as { message?: string }
+    throw new Error(err?.message ?? 'Failed to load profile')
+  }
+  const json = (await res.json()) as { success: boolean; student: StudentRecord }
+  return json.student
 }
 
 export interface RegisterSuccess {
@@ -28,7 +46,7 @@ export async function registerStudent(
 ): Promise<RegisterResponse> {
   const res = await fetch(`${API_BASE}/api/students/register`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   })
 
