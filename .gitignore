@@ -30,9 +30,6 @@ Thumbs.db
 .vscode/
 *.sublime-*
 
-# Local data
-backend/data/
-
 # Testing / coverage
 coverage/
 .nyc_output/
