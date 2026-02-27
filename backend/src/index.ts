@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import swaggerUi from 'swagger-ui-express'
 import { studentsRouter } from './routes/students.js'
 import { authRouter } from './routes/auth.js'
+import { questionsRouter } from './routes/questions.js'
 
 const app = express()
 const PORT = Number(process.env.PORT) || 3000
@@ -12,7 +13,7 @@ app.use(express.json())
 
 app.use((_req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN ?? '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   if (_req.method === 'OPTIONS') {
     res.sendStatus(204)
@@ -47,6 +48,7 @@ app.get('/redoc', (_req, res) => {
 
 app.use('/api/auth', authRouter)
 app.use('/api/students', studentsRouter)
+app.use('/api/questions', questionsRouter)
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
@@ -63,9 +65,11 @@ app.use((err: unknown, _req: express.Request, res: express.Response, _next: expr
 async function start() {
   const { initStore } = await import('./store.js')
   const { initUsersStore, ensureDefaultAdmin } = await import('./users-store.js')
+  const { initQuestionsStore } = await import('./questions-store.js')
   await initStore()
   initUsersStore()
   ensureDefaultAdmin()
+  initQuestionsStore()
   app.listen(PORT, () => {
     console.log(`🚀 Pareeksha backend running at http://localhost:${PORT}`);
     console.log('🔁 OpenAPI spec: http://localhost:3000/openapi.json');

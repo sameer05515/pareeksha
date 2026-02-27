@@ -1,0 +1,15 @@
+[
+  {
+    "questionText": "What is capital of India?",
+    "options": [
+      "New Delhi",
+      "Mumbai",
+      "Patna",
+      "Kolkata"
+    ],
+    "correctIndex": 0,
+    "id": "67c27428-f904-4f0f-946e-474c65c4175b",
+    "createdAt": "2026-02-27T12:58:08.895Z",
+    "createdBy": "62d15e49-01b7-42d1-9041-0d4f9618777b"
+  }
+]

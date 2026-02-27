@@ -39,13 +39,22 @@ export function Sidebar() {
         {isAuthenticated && (
           <>
             {user?.role === 'admin' && (
-              <NavLink
-                to="/students"
-                className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}
-                end
-              >
-                All students
-              </NavLink>
+              <>
+                <NavLink
+                  to="/students"
+                  className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}
+                  end
+                >
+                  All students
+                </NavLink>
+                <NavLink
+                  to="/questions"
+                  className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}
+                  end
+                >
+                  Questions
+                </NavLink>
+              </>
             )}
             {user?.role === 'student' && (
               <NavLink
