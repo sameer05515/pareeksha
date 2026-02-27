@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Registration</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f4f6f9;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+.container {
+    background: white;
+    padding: 25px;
+    width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+}
+button {
+    padding: 8px 15px;
+    margin-top: 10px;
+}
+.hidden { display:none; }
+.progress { font-weight:bold; margin-bottom:10px; }
+.error { color:red; font-size:12px; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="progress">Step <span id="stepNo">1</span> of 3</div>
+
+<form id="form">
+
+<!-- STEP 1 -->
+<div class="step">
+
+<h3>Basic Details</h3>
+
+<label>Preferred Language</label>
+<select required>
+<option value="">Select</option>
+<option>English</option>
+<option>Hindi</option>
+<option>Marathi</option>
+</select>
+
+<label>Aadhaar Number</label>
+<input type="text" id="aadhaar" maxlength="12" required>
+
+<label>First Name</label>
+<input type="text" required>
+
+<label>Middle Name</label>
+<input type="text">
+
+<label>Last Name</label>
+<input type="text" required>
+
+<label>Password</label>
+<input type="password" id="password" required>
+
+<label>Confirm Password</label>
+<input type="password" id="confirmPassword" required>
+<div id="passError" class="error"></div>
+
+<label>Date Of Birth</label>
+<input type="date" id="dob" required>
+
+<label>Age</label>
+<input type="text" id="age" readonly>
+
+<label>Gender</label>
+<select required>
+<option value="">Select</option>
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
+
+</div>
+
+<!-- STEP 2 -->
+<div class="step hidden">
+
+<h3>School Details</h3>
+
+<label>School Name & Address</label>
+<input type="text" required>
+
+<label>School Enrollment Number</label>
+<input type="text" required>
+
+<label>Class / Grade</label>
+<select required>
+<option value="">Select</option>
+<option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>11</option>
+<option>12</option>
+</select>
+
+<label>Board</label>
+<select required>
+<option value="">Select</option>
+<option>CBSE</option>
+<option>ICSE</option>
+<option>State Board</option>
+</select>
+
+</div>
+
+<!-- STEP 3 -->
+<div class="step hidden">
+
+<h3>Address & Contact</h3>
+
+<label>Address Line 1</label>
+<input type="text" required>
+
+<label>Address Line 2</label>
+<input type="text">
+
+<label>City</label>
+<select required>
+<option value="">Select</option>
+<option>Mumbai</option>
+<option>Delhi</option>
+<option>Pune</option>
+</select>
+
+<label>State</label>
+<select required>
+<option value="">Select</option>
+<option>Maharashtra</option>
+<option>Delhi</option>
+<option>Karnataka</option>
+</select>
+
+<label>Country</label>
+<select required>
+<option value="">Select</option>
+<option>India</option>
+</select>
+
+<label>Pincode</label>
+<input type="text" id="pincode" maxlength="6" required>
+
+<label>Email ID</label>
+<input type="email" required>
+
+<label>Mobile Number</label>
+<input type="text" id="mobile" maxlength="10" required>
+
+<button type="submit">Submit</button>
+
+</div>
+
+<div style="display:flex; justify-content:space-between;">
+<button type="button" id="prevBtn">Back</button>
+<button type="button" id="nextBtn">Next</button>
+</div>
+
+</form>
+</div>
+
+<script>
+let current = 0;
+const steps = document.querySelectorAll(".step");
+const stepNo = document.getElementById("stepNo");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+function showStep(n){
+steps.forEach((step,i)=> step.classList.toggle("hidden", i!==n));
+stepNo.textContent = n+1;
+prevBtn.style.display = n==0 ? "none":"inline-block";
+nextBtn.style.display = n==steps.length-1 ? "none":"inline-block";
+}
+showStep(current);
+
+nextBtn.onclick = ()=>{ current++; showStep(current); }
+prevBtn.onclick = ()=>{ current--; showStep(current); }
+
+// Age Auto Calculation
+document.getElementById("dob").addEventListener("change", function(){
+let dob = new Date(this.value);
+let today = new Date();
+let age = today.getFullYear() - dob.getFullYear();
+let m = today.getMonth() - dob.getMonth();
+if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+document.getElementById("age").value = age;
+});
+
+// Password Match
+document.getElementById("confirmPassword").addEventListener("keyup", function(){
+if(this.value !== document.getElementById("password").value){
+document.getElementById("passError").innerText = "Passwords do not match";
+} else {
+document.getElementById("passError").innerText = "";
+}
+});
+
+// Aadhaar Validation
+document.getElementById("aadhaar").addEventListener("input", function(){
+this.value = this.value.replace(/\D/g,'');
+});
+
+// Pincode Validation
+document.getElementById("pincode").addEventListener("input", function(){
+this.value = this.value.replace(/\D/g,'');
+});
+
+// Mobile Validation
+document.getElementById("mobile").addEventListener("input", function(){
+this.value = this.value.replace(/\D/g,'');
+});
+</script>
+
+</body>
+</html>

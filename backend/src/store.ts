@@ -1,5 +1,13 @@
 import { getPool, ensureTable, type StudentRow } from './db.js'
 import type { StudentRecord } from './types/student.js'
+import {
+  getAllStudentsFile,
+  addStudentFile,
+  getStudentByIdFile,
+  initFileStore,
+} from './store-file.js'
+
+let useFileStore = false
 
 function rowToRecord(row: StudentRow): StudentRecord {
   const toDateStr = (v: unknown): string =>
@@ -9,68 +17,84 @@ function rowToRecord(row: StudentRow): StudentRecord {
   return {
     id: row.id,
     createdAt: toIso(row.createdAt),
-    firstName: row.firstName,
-    lastName: row.lastName,
-    email: row.email,
-    dateOfBirth: toDateStr(row.dateOfBirth),
-    phone: row.phone ?? '',
+    preferredLanguage: row.preferredLanguage ?? '',
     adhaarNumber: row.adhaarNumber ?? '',
-    schoolName: row.schoolName,
-    class: row.class,
+    firstName: row.firstName,
+    middleName: row.middleName ?? '',
+    lastName: row.lastName,
+    password: row.password,
+    dateOfBirth: toDateStr(row.dateOfBirth),
     gender: row.gender,
-    address: row.address,
+    schoolNameAndAddress: row.schoolNameAndAddress,
+    schoolEnrollmentNumber: row.schoolEnrollmentNumber,
+    class: row.class,
+    board: row.board,
+    addressLine1: row.addressLine1,
+    addressLine2: row.addressLine2 ?? '',
     city: row.city,
     state: row.state,
+    country: row.country,
     pincode: row.pincode,
-    guardianName: row.guardianName,
-    guardianPhone: row.guardianPhone ?? '',
+    email: row.email,
+    mobile: row.mobile ?? '',
   }
 }
 
+const COLS = `id, createdAt, preferredLanguage, adhaarNumber, firstName, middleName, lastName,
+  password, dateOfBirth, gender, schoolNameAndAddress, schoolEnrollmentNumber, \`class\`, board,
+  addressLine1, addressLine2, city, state, country, pincode, email, mobile`
+
 export async function getAllStudents(): Promise<StudentRecord[]> {
+  if (useFileStore) return Promise.resolve(getAllStudentsFile())
   const [rows] = await getPool().execute<StudentRow[]>(
-    `SELECT id, createdAt, firstName, lastName, email, dateOfBirth, phone, adhaarNumber,
-     schoolName, \`class\`, gender, address, city, state, pincode, guardianName, guardianPhone
-     FROM students ORDER BY createdAt DESC`
+    `SELECT ${COLS} FROM students ORDER BY createdAt DESC`
   )
   return (rows ?? []).map(rowToRecord)
 }
 
 export async function addStudent(record: StudentRecord): Promise<void> {
+  if (useFileStore) {
+    addStudentFile(record)
+    return
+  }
   const createdAt = new Date(record.createdAt)
   await getPool().execute(
     `INSERT INTO students (
-      id, createdAt, firstName, lastName, email, dateOfBirth, phone, adhaarNumber,
-      schoolName, \`class\`, gender, address, city, state, pincode,
-      guardianName, guardianPhone
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      id, createdAt, preferredLanguage, adhaarNumber, firstName, middleName, lastName,
+      password, dateOfBirth, gender, schoolNameAndAddress, schoolEnrollmentNumber, \`class\`, board,
+      addressLine1, addressLine2, city, state, country, pincode, email, mobile
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       record.id,
       createdAt,
-      record.firstName,
-      record.lastName,
-      record.email,
-      record.dateOfBirth,
-      record.phone,
+      record.preferredLanguage,
       record.adhaarNumber,
-      record.schoolName,
-      record.class,
+      record.firstName,
+      record.middleName,
+      record.lastName,
+      record.password,
+      record.dateOfBirth,
       record.gender,
-      record.address,
+      record.schoolNameAndAddress,
+      record.schoolEnrollmentNumber,
+      record.class,
+      record.board,
+      record.addressLine1,
+      record.addressLine2,
       record.city,
       record.state,
+      record.country,
       record.pincode,
-      record.guardianName,
-      record.guardianPhone,
+      record.email,
+      record.mobile,
     ]
   )
 }
 
 export async function getStudentById(id: string): Promise<StudentRecord | undefined> {
+  if (useFileStore) return Promise.resolve(getStudentByIdFile(id))
   const [rows] = await getPool().execute<StudentRow[]>(
-    `SELECT id, createdAt, firstName, lastName, email, dateOfBirth, phone, adhaarNumber,
-     schoolName, \`class\`, gender, address, city, state, pincode, guardianName, guardianPhone
-     FROM students WHERE id = ?`,
+    `SELECT ${COLS} FROM students WHERE id = ?`,
     [id]
   )
   const row = (rows ?? [])[0]
@@ -78,5 +102,24 @@ export async function getStudentById(id: string): Promise<StudentRecord | undefi
 }
 
 export async function initStore(): Promise<void> {
-  await ensureTable()
+  try {
+    await ensureTable()
+    console.log('Using MySQL store (database: student)')
+  } catch (err) {
+    const code = err && typeof (err as { code?: string }).code === 'string' ? (err as { code: string }).code : ''
+    const msg = err instanceof Error ? err.message : String(err)
+    if (code === 'AUTH_SWITCH_PLUGIN_ERROR' || msg.includes('auth_gssapi_client')) {
+      console.warn(
+        'MySQL auth plugin (GSSAPI) not supported by this driver. Using file store instead. Data will be saved to backend/data/students.json'
+      )
+      console.warn(
+        'To use MySQL, create a user with: ALTER USER \'your_user\'@\'localhost\' IDENTIFIED WITH mysql_native_password BY \'password\';'
+      )
+    } else {
+      console.warn('MySQL connection failed:', msg)
+      console.warn('Using file store. Data will be saved to backend/data/students.json')
+    }
+    useFileStore = true
+    initFileStore()
+  }
 }

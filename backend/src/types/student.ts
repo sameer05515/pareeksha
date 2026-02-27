@@ -1,22 +1,27 @@
 /**
- * Matches frontend StudentFormData. "class" is the student's class/grade.
+ * Matches frontend StudentFormData (register.html).
  */
 export interface StudentRegistrationBody {
-  firstName: string
-  lastName: string
-  email: string
-  dateOfBirth: string
-  phone: string
+  preferredLanguage: string
   adhaarNumber: string
-  schoolName: string
-  class: string
+  firstName: string
+  middleName: string
+  lastName: string
+  password: string
+  dateOfBirth: string
   gender: string
-  address: string
+  schoolNameAndAddress: string
+  schoolEnrollmentNumber: string
+  class: string
+  board: string
+  addressLine1: string
+  addressLine2: string
   city: string
   state: string
+  country: string
   pincode: string
-  guardianName: string
-  guardianPhone: string
+  email: string
+  mobile: string
 }
 
 export interface StudentRecord extends StudentRegistrationBody {

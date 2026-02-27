@@ -4,6 +4,25 @@
   gap: 2rem;
 }
 
+.progress {
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.progress span {
+  color: var(--accent);
+}
+
+.step {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step[data-visible="true"] {
+  display: flex;
+}
+
 .section {
   display: flex;
   flex-direction: column;
@@ -49,6 +68,7 @@
   flex-wrap: wrap;
   gap: 0.75rem;
   padding-top: 0.5rem;
+  justify-content: space-between;
 }
 
 .submitButton {

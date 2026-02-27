@@ -31,21 +31,26 @@ export async function ensureTable(): Promise<void> {
     CREATE TABLE IF NOT EXISTS students (
       id VARCHAR(36) PRIMARY KEY,
       createdAt DATETIME(3) NOT NULL,
-      firstName VARCHAR(100) NOT NULL,
-      lastName VARCHAR(100) NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      dateOfBirth DATE NOT NULL,
-      phone VARCHAR(20) NOT NULL DEFAULT '',
+      preferredLanguage VARCHAR(50) NOT NULL DEFAULT '',
       adhaarNumber VARCHAR(20) NOT NULL DEFAULT '',
-      schoolName VARCHAR(255) NOT NULL,
-      \`class\` VARCHAR(50) NOT NULL,
+      firstName VARCHAR(100) NOT NULL,
+      middleName VARCHAR(100) NOT NULL DEFAULT '',
+      lastName VARCHAR(100) NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      dateOfBirth DATE NOT NULL,
       gender VARCHAR(50) NOT NULL,
-      address TEXT NOT NULL,
+      schoolNameAndAddress VARCHAR(500) NOT NULL,
+      schoolEnrollmentNumber VARCHAR(100) NOT NULL,
+      \`class\` VARCHAR(10) NOT NULL,
+      board VARCHAR(100) NOT NULL,
+      addressLine1 VARCHAR(500) NOT NULL,
+      addressLine2 VARCHAR(500) NOT NULL DEFAULT '',
       city VARCHAR(100) NOT NULL,
       state VARCHAR(100) NOT NULL,
+      country VARCHAR(100) NOT NULL,
       pincode VARCHAR(10) NOT NULL,
-      guardianName VARCHAR(255) NOT NULL,
-      guardianPhone VARCHAR(20) NOT NULL DEFAULT ''
+      email VARCHAR(255) NOT NULL,
+      mobile VARCHAR(20) NOT NULL
     )
   `)
 }
@@ -53,19 +58,24 @@ export async function ensureTable(): Promise<void> {
 export type StudentRow = RowDataPacket & {
   id: string
   createdAt: Date
-  firstName: string
-  lastName: string
-  email: string
-  dateOfBirth: string
-  phone: string
+  preferredLanguage: string
   adhaarNumber: string
-  schoolName: string
-  class: string
+  firstName: string
+  middleName: string
+  lastName: string
+  password: string
+  dateOfBirth: string
   gender: string
-  address: string
+  schoolNameAndAddress: string
+  schoolEnrollmentNumber: string
+  class: string
+  board: string
+  addressLine1: string
+  addressLine2: string
   city: string
   state: string
+  country: string
   pincode: string
-  guardianName: string
-  guardianPhone: string
+  email: string
+  mobile: string
 }

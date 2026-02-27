@@ -1,37 +1,53 @@
 export interface StudentFormData {
-  firstName: string
-  lastName: string
-  email: string
-  dateOfBirth: string
-  phone: string
+  preferredLanguage: string
   adhaarNumber: string
-  schoolName: string
-  class: string
+  firstName: string
+  middleName: string
+  lastName: string
+  password: string
+  dateOfBirth: string
   gender: string
-  address: string
+  schoolNameAndAddress: string
+  schoolEnrollmentNumber: string
+  class: string
+  board: string
+  addressLine1: string
+  addressLine2: string
   city: string
   state: string
+  country: string
   pincode: string
-  guardianName: string
-  guardianPhone: string
+  email: string
+  mobile: string
 }
 
 export const initialFormData: StudentFormData = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  dateOfBirth: '',
-  phone: '',
+  preferredLanguage: '',
   adhaarNumber: '',
-  schoolName: '',
-  class: '',
+  firstName: '',
+  middleName: '',
+  lastName: '',
+  password: '',
+  dateOfBirth: '',
   gender: '',
-  address: '',
+  schoolNameAndAddress: '',
+  schoolEnrollmentNumber: '',
+  class: '',
+  board: '',
+  addressLine1: '',
+  addressLine2: '',
   city: '',
   state: '',
+  country: '',
   pincode: '',
-  guardianName: '',
-  guardianPhone: '',
+  email: '',
+  mobile: '',
 }
 
-export const GENDERS = ['Male', 'Female', 'Other', 'Prefer not to say'] as const
+export const LANGUAGES = ['English', 'Hindi', 'Marathi'] as const
+export const GENDERS = ['Male', 'Female', 'Other'] as const
+export const CLASS_OPTIONS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] as const
+export const BOARDS = ['CBSE', 'ICSE', 'State Board'] as const
+export const CITIES = ['Mumbai', 'Delhi', 'Pune'] as const
+export const STATES = ['Maharashtra', 'Delhi', 'Karnataka'] as const
+export const COUNTRIES = ['India'] as const

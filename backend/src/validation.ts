@@ -17,18 +17,24 @@ export function validateRegistration(
   const b = body as Record<string, unknown>
 
   const required = [
+    'preferredLanguage',
+    'adhaarNumber',
     'firstName',
     'lastName',
-    'email',
+    'password',
     'dateOfBirth',
     'gender',
-    'address',
+    'schoolNameAndAddress',
+    'schoolEnrollmentNumber',
+    'class',
+    'board',
+    'addressLine1',
     'city',
     'state',
+    'country',
     'pincode',
-    'guardianName',
-    'schoolName',
-    'class',
+    'email',
+    'mobile',
   ] as const
 
   for (const key of required) {
@@ -61,26 +67,38 @@ export function validateRegistration(
     }
   }
 
+  const mobile = b.mobile
+  if (mobile !== undefined && mobile !== null && String(mobile).trim() !== '') {
+    if (!/^[0-9]{10}$/.test(String(mobile).replace(/\s/g, ''))) {
+      errors.push({ field: 'mobile', message: 'Mobile number must be 10 digits' })
+    }
+  }
+
   if (errors.length > 0) {
     return { success: false, errors }
   }
 
   const data: StudentRegistrationBody = {
+    preferredLanguage: String(b.preferredLanguage).trim(),
+    adhaarNumber: String(b.adhaarNumber).trim(),
     firstName: String(b.firstName).trim(),
+    middleName: String(b.middleName ?? '').trim(),
     lastName: String(b.lastName).trim(),
-    email: String(b.email).trim(),
+    password: String(b.password).trim(),
     dateOfBirth: String(b.dateOfBirth).trim(),
-    phone: String(b.phone ?? '').trim(),
-    adhaarNumber: String(b.adhaarNumber ?? '').trim(),
-    schoolName: String(b.schoolName).trim(),
-    class: String(b.class).trim(),
     gender: String(b.gender).trim(),
-    address: String(b.address).trim(),
+    schoolNameAndAddress: String(b.schoolNameAndAddress).trim(),
+    schoolEnrollmentNumber: String(b.schoolEnrollmentNumber).trim(),
+    class: String(b.class).trim(),
+    board: String(b.board).trim(),
+    addressLine1: String(b.addressLine1).trim(),
+    addressLine2: String(b.addressLine2 ?? '').trim(),
     city: String(b.city).trim(),
     state: String(b.state).trim(),
+    country: String(b.country).trim(),
     pincode: String(b.pincode).trim(),
-    guardianName: String(b.guardianName).trim(),
-    guardianPhone: String(b.guardianPhone ?? '').trim(),
+    email: String(b.email).trim(),
+    mobile: String(b.mobile).trim(),
   }
 
   return { success: true, data }
