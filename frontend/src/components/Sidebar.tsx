@@ -56,6 +56,13 @@ export function Sidebar() {
                 My profile
               </NavLink>
             )}
+            <NavLink
+              to="/change-password"
+              className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}
+              end
+            >
+              Change password
+            </NavLink>
             <div className={styles.user}>
               <span className={styles.userEmail}>{user?.email}</span>
               <button type="button" className={styles.logoutBtn} onClick={handleLogout}>

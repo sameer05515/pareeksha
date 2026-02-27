@@ -45,6 +45,18 @@ export function addUser(user: User): void {
   }
 }
 
+export function updateUserPassword(userId: string, passwordHash: string): boolean {
+  const index = users.findIndex((u) => u.id === userId)
+  if (index === -1) return false
+  users[index] = { ...users[index], passwordHash }
+  try {
+    saveUsers(users)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function initUsersStore(): void {
   users = loadUsers()
 }

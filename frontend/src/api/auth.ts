@@ -61,3 +61,21 @@ export async function login(email: string, password: string): Promise<LoginRespo
   }
   return json
 }
+
+export interface ChangePasswordResponse {
+  success: boolean
+  message?: string
+}
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<ChangePasswordResponse> {
+  const res = await fetch(`${API_BASE}/api/auth/password`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ currentPassword, newPassword }),
+  })
+  const json = (await res.json()) as ChangePasswordResponse
+  return json
+}

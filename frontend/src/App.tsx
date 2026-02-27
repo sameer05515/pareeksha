@@ -6,6 +6,7 @@ import { RegisterPage } from '@/pages/RegisterPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { StudentsPage } from '@/pages/StudentsPage'
 import { ProfilePage } from '@/pages/ProfilePage'
+import { ChangePasswordPage } from '@/pages/ChangePasswordPage'
 
 function AppRoutes() {
   return (
@@ -16,6 +17,7 @@ function AppRoutes() {
         <Route path="login" element={<LoginPage />} />
         <Route path="students" element={<StudentsPage />} />
         <Route path="profile" element={<ProfilePage />} />
+        <Route path="change-password" element={<ChangePasswordPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
