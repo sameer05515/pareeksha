@@ -1,87 +1,34 @@
-import { useState } from 'react'
-import { useAuth } from '@/context/AuthContext'
-import type { AuthUser } from '@/api/auth'
-import { StudentRegistrationForm } from '@/components/StudentRegistrationForm'
-import { StudentsList } from '@/components/StudentsList'
-import { MyProfile } from '@/components/MyProfile'
-import { LoginForm } from '@/components/LoginForm'
-import styles from './App.module.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from '@/context/AuthContext'
+import { Layout } from '@/components/Layout'
+import { HomeRedirect } from '@/pages/HomeRedirect'
+import { RegisterPage } from '@/pages/RegisterPage'
+import { LoginPage } from '@/pages/LoginPage'
+import { StudentsPage } from '@/pages/StudentsPage'
+import { ProfilePage } from '@/pages/ProfilePage'
 
-type View = 'register' | 'students' | 'profile' | 'login'
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomeRedirect />} />
+        <Route path="register" element={<RegisterPage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="students" element={<StudentsPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
 
 function App() {
-  const { user, isAuthenticated, logout, setUser, setToken } = useAuth()
-  const [view, setView] = useState<View>('register')
-
-  const handleLoginSuccess = (u: AuthUser, token: string) => {
-    setUser(u)
-    setToken(token)
-    setView(u.role === 'admin' ? 'students' : 'profile')
-  }
-
   return (
-    <div className={styles.app}>
-      <header className={styles.header}>
-        <h1 className={styles.logo}>Pareeksha</h1>
-        <p className={styles.tagline}>Student Registration</p>
-        <nav className={styles.nav}>
-          {!isAuthenticated && (
-            <button
-              type="button"
-              className={styles.navLink + (view === 'register' ? ' ' + styles.navLinkActive : '')}
-              onClick={() => setView('register')}
-            >
-              Register
-            </button>
-          )}
-          {!isAuthenticated ? (
-            <button
-              type="button"
-              className={styles.navLink + (view === 'login' ? ' ' + styles.navLinkActive : '')}
-              onClick={() => setView('login')}
-            >
-              Login
-            </button>
-          ) : (
-            <>
-              {user?.role === 'admin' && (
-                <button
-                  type="button"
-                  className={styles.navLink + (view === 'students' ? ' ' + styles.navLinkActive : '')}
-                  onClick={() => setView('students')}
-                >
-                  All students
-                </button>
-              )}
-              {user?.role === 'student' && (
-                <button
-                  type="button"
-                  className={styles.navLink + (view === 'profile' ? ' ' + styles.navLinkActive : '')}
-                  onClick={() => setView('profile')}
-                >
-                  My profile
-                </button>
-              )}
-              <span className={styles.userEmail}>{user?.email}</span>
-              <button type="button" className={styles.navLink} onClick={() => { logout(); setView('register') }}>
-                Logout
-              </button>
-            </>
-          )}
-        </nav>
-      </header>
-      <main className={styles.main}>
-        <div className={styles.card}>
-          {view === 'register' && !isAuthenticated && <StudentRegistrationForm />}
-          {view === 'students' && <StudentsList />}
-          {view === 'profile' && <MyProfile />}
-          {view === 'login' && <LoginForm onSuccess={handleLoginSuccess} />}
-          {isAuthenticated && view === 'register' && (
-            user?.role === 'admin' ? <StudentsList /> : <MyProfile />
-          )}
-        </div>
-      </main>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 
