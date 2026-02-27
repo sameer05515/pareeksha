@@ -26,7 +26,37 @@
 .tagline {
   font-size: 1rem;
   color: var(--text-muted);
-  margin: 0;
+  margin: 0 0 1rem 0;
+}
+
+.nav {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.navLink {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.navLink:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.navLinkActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
 }
 
 .main {

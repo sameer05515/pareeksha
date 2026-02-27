@@ -1,6 +1,13 @@
-import type { StudentFormData } from '@/types/student'
+import type { StudentFormData, StudentRecord } from '@/types/student'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
+
+export async function fetchStudents(): Promise<StudentRecord[]> {
+  const res = await fetch(`${API_BASE}/api/students`)
+  if (!res.ok) throw new Error('Failed to load students')
+  const json = (await res.json()) as { success: boolean; students: StudentRecord[] }
+  return json.students ?? []
+}
 
 export interface RegisterSuccess {
   success: true

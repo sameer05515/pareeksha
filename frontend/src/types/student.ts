@@ -51,3 +51,8 @@ export const BOARDS = ['CBSE', 'ICSE', 'State Board'] as const
 export const CITIES = ['Mumbai', 'Delhi', 'Pune'] as const
 export const STATES = ['Maharashtra', 'Delhi', 'Karnataka'] as const
 export const COUNTRIES = ['India'] as const
+
+export interface StudentRecord extends StudentFormData {
+  id: string
+  createdAt: string
+}

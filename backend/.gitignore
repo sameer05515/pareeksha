@@ -5,7 +5,7 @@ node_modules/
 dist/
 
 # Local data (optional: remove to persist in git)
-data/
+
 
 # Environment (do not commit secrets)
 .env
