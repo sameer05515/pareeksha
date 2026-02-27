@@ -22,5 +22,29 @@
     "mobile": "8010645624",
     "id": "dce3099e-ceba-4e11-8dc3-c75bc97d5dea",
     "createdAt": "2026-02-27T10:38:06.829Z"
+  },
+  {
+    "preferredLanguage": "English",
+    "adhaarNumber": "123412341234",
+    "firstName": "Premendra",
+    "middleName": "",
+    "lastName": "Kumar",
+    "password": "123456",
+    "dateOfBirth": "1986-05-31",
+    "gender": "Male",
+    "schoolNameAndAddress": "Gyan Sarovar",
+    "schoolEnrollmentNumber": "12345678",
+    "class": "4",
+    "board": "CBSE",
+    "addressLine1": "Sector 55",
+    "addressLine2": "Ballabhgarh",
+    "city": "Delhi",
+    "state": "Delhi",
+    "country": "India",
+    "pincode": "121004",
+    "email": "premendra.bce05515@gmail.com",
+    "mobile": "8010645624",
+    "id": "c6400243-10d1-4d6b-924b-69d7bf7f6127",
+    "createdAt": "2026-02-27T12:26:54.221Z"
   }
 ]

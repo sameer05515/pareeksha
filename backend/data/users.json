@@ -5,5 +5,13 @@
     "passwordHash": "$2a$10$60bHXDvrXIHkJ0kM1C44muZQgq7mzTyZ6VCeY4kVyp4YJohxunO52",
     "role": "admin",
     "createdAt": "2026-02-27T12:00:04.933Z"
+  },
+  {
+    "id": "eecfa3ed-f6e0-4a84-a215-518e5e524e8d",
+    "email": "premendra.bce05515@gmail.com",
+    "passwordHash": "$2a$10$kjaeHDUdORFAr3IJgUYHMu2Ku4QBBVQlY3OQUBHWIeooeYHhpsn5u",
+    "role": "student",
+    "studentId": "c6400243-10d1-4d6b-924b-69d7bf7f6127",
+    "createdAt": "2026-02-27T12:26:54.368Z"
   }
 ]
