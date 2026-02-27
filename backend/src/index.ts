@@ -1,5 +1,6 @@
 import express from 'express'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { readFileSync } from 'node:fs'
 import swaggerUi from 'swagger-ui-express'
 import { studentsRouter } from './routes/students.js'
@@ -22,11 +23,14 @@ app.use((_req, res, next) => {
   next()
 })
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const backendRoot = path.join(__dirname, '..')
+
 // OpenAPI spec (used by Swagger UI and ReDoc)
 let openApiSpec: object | null = null
 function getOpenApiSpec(): object {
   if (!openApiSpec) {
-    const specPath = path.join(process.cwd(), 'openapi.json')
+    const specPath = path.join(backendRoot, 'openapi.json')
     openApiSpec = JSON.parse(readFileSync(specPath, 'utf-8')) as object
   }
   return openApiSpec
@@ -43,7 +47,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getOpenApiSpec(), {
 
 // ReDoc (static HTML that loads /openapi.json)
 app.get('/redoc', (_req, res) => {
-  res.sendFile(path.join(process.cwd(), 'public', 'redoc.html'))
+  res.sendFile(path.join(backendRoot, 'public', 'redoc.html'))
 })
 
 app.use('/api/auth', authRouter)
