@@ -11,5 +11,57 @@
     "id": "67c27428-f904-4f0f-946e-474c65c4175b",
     "createdAt": "2026-02-27T12:58:08.895Z",
     "createdBy": "62d15e49-01b7-42d1-9041-0d4f9618777b"
+  },
+  {
+    "questionText": "Who is known as the Father of the Nation in India?",
+    "options": [
+      "Jawaharlal Nehru",
+      "Mahatma Gandhi",
+      "Subhas Chandra Bose",
+      "B. R. Ambedkar"
+    ],
+    "correctIndex": 1,
+    "id": "b3a11e90-3e52-43be-851e-5d45effca639",
+    "createdAt": "2026-02-27T13:10:00.000Z",
+    "createdBy": "62d15e49-01b7-42d1-9041-0d4f9618777b"
+  },
+  {
+    "questionText": "Which is the largest continent by area?",
+    "options": [
+      "Africa",
+      "North America",
+      "Europe",
+      "Asia"
+    ],
+    "correctIndex": 3,
+    "id": "d4db134d-8220-4a71-9617-6b734ea8edef",
+    "createdAt": "2026-02-27T13:11:00.000Z",
+    "createdBy": "62d15e49-01b7-42d1-9041-0d4f9618777b"
+  },
+  {
+    "questionText": "Which planet is known as the Red Planet?",
+    "options": [
+      "Mars",
+      "Jupiter",
+      "Mercury",
+      "Venus"
+    ],
+    "correctIndex": 0,
+    "id": "aac6a5f2-87a4-4e8a-935b-09ff67bdfa97",
+    "createdAt": "2026-02-27T13:12:00.000Z",
+    "createdBy": "62d15e49-01b7-42d1-9041-0d4f9618777b"
+  },
+  {
+    "questionText": "In which year did India gain independence?",
+    "options": [
+      "1945",
+      "1947",
+      "1950",
+      "1935"
+    ],
+    "correctIndex": 1,
+    "id": "e286d5d8-1fdc-46b2-8491-7184899a650e",
+    "createdAt": "2026-02-27T13:13:00.000Z",
+    "createdBy": "62d15e49-01b7-42d1-9041-0d4f9618777b"
   }
 ]
