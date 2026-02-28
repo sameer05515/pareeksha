@@ -1,6 +1,8 @@
-import { useState, FormEvent, useEffect } from 'react'
+import { useState, FormEvent, useEffect, useMemo } from 'react'
 import { createExamSchedule, updateExamSchedule } from '@/api/exam-schedules'
 import type { ExamSchedule, CreateExamScheduleBody } from '@/types/exam-schedule'
+import { fetchQuestions } from '@/api/questions'
+import type { Question } from '@/types/question'
 
 function toLocalDatetime(iso: string): string {
   try {
@@ -38,6 +40,11 @@ export function ExamScheduleForm({
   const [durationMinutes, setDurationMinutes] = useState<string>(
     editing?.durationMinutes != null ? String(editing.durationMinutes) : ''
   )
+  const [allQuestions, setAllQuestions] = useState<Question[]>([])
+  const [questionsLoading, setQuestionsLoading] = useState(false)
+  const [questionsError, setQuestionsError] = useState<string | null>(null)
+  const [questionSearch, setQuestionSearch] = useState('')
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<string[]>(editing?.questionIds ?? [])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -46,13 +53,51 @@ export function ExamScheduleForm({
       setTitle(editing.title)
       setDatetimeLocal(toLocalDatetime(editing.scheduledAt))
       setDurationMinutes(editing.durationMinutes != null ? String(editing.durationMinutes) : '')
+      setSelectedQuestionIds(editing.questionIds ?? [])
     } else {
       setTitle('')
       setDatetimeLocal('')
       setDurationMinutes('')
+      setSelectedQuestionIds([])
     }
     setError(null)
   }, [editing])
+
+  useEffect(() => {
+    let cancelled = false
+    setQuestionsLoading(true)
+    setQuestionsError(null)
+    fetchQuestions()
+      .then((qs) => {
+        if (!cancelled) setAllQuestions(qs)
+      })
+      .catch((err) => {
+        if (!cancelled) setQuestionsError(err instanceof Error ? err.message : 'Failed to load questions')
+      })
+      .finally(() => {
+        if (!cancelled) setQuestionsLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const filteredQuestions = useMemo(() => {
+    const q = questionSearch.trim().toLowerCase()
+    if (!q) return allQuestions
+    return allQuestions.filter((x) => x.questionText.toLowerCase().includes(q))
+  }, [allQuestions, questionSearch])
+
+  const toggleQuestion = (id: string) => {
+    setSelectedQuestionIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+
+  const selectAllVisible = () => {
+    const visible = filteredQuestions.map((q) => q.id)
+    setSelectedQuestionIds((prev) => Array.from(new Set([...prev, ...visible])))
+  }
+
+  const clearSelection = () => setSelectedQuestionIds([])
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -77,6 +122,7 @@ export function ExamScheduleForm({
       return
     }
     if (dur !== undefined) body.durationMinutes = dur
+    if (selectedQuestionIds.length > 0) body.questionIds = selectedQuestionIds
 
     setLoading(true)
     try {
@@ -85,6 +131,7 @@ export function ExamScheduleForm({
           title: body.title,
           scheduledAt: body.scheduledAt,
           durationMinutes: body.durationMinutes,
+          questionIds: body.questionIds,
         })
       } else {
         await createExamSchedule(body)
@@ -92,6 +139,7 @@ export function ExamScheduleForm({
       setTitle('')
       setDatetimeLocal('')
       setDurationMinutes('')
+      setSelectedQuestionIds([])
       onSuccess?.()
       onCancelEdit?.()
     } catch (err) {
@@ -103,7 +151,7 @@ export function ExamScheduleForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-[480px]">
-      <h3 className="text-base font-semibold text-accent m-0 tracking-wide">
+      <h3 className="font-semibold text-accent m-0 tracking-wide">
         {isEdit ? 'Edit exam schedule' : 'Add exam schedule'}
       </h3>
       {error && (
@@ -144,6 +192,68 @@ export function ExamScheduleForm({
           placeholder="e.g. 60"
         />
       </label>
+
+      <fieldset className="border border-border rounded p-4 m-0">
+        <legend className="text-sm text-muted px-2">Questions (optional)</legend>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="text"
+              value={questionSearch}
+              onChange={(e) => setQuestionSearch(e.target.value)}
+              placeholder="Search questions…"
+              className="flex-1 min-w-[220px] py-2 px-3 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
+            />
+            <button
+              type="button"
+              onClick={selectAllVisible}
+              disabled={questionsLoading || filteredQuestions.length === 0}
+              className="py-2 px-3 bg-transparent border border-border rounded text-sm text-muted hover:bg-input hover:text-text disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Select all
+            </button>
+            <button
+              type="button"
+              onClick={clearSelection}
+              disabled={selectedQuestionIds.length === 0}
+              className="py-2 px-3 bg-transparent border border-border rounded text-sm text-muted hover:bg-input hover:text-text disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Clear
+            </button>
+            <span className="text-sm text-muted">
+              Selected: <span className="text-text font-medium">{selectedQuestionIds.length}</span>
+            </span>
+          </div>
+
+          {questionsLoading && <p className="text-sm text-muted m-0">Loading questions…</p>}
+          {questionsError && <p className="text-sm text-error m-0">{questionsError}</p>}
+
+          {!questionsLoading && !questionsError && (
+            <div className="max-h-64 overflow-auto border border-border rounded">
+              {filteredQuestions.length === 0 ? (
+                <p className="text-sm text-muted m-0 p-3">No questions found.</p>
+              ) : (
+                <ul className="m-0 p-0 list-none">
+                  {filteredQuestions.map((q) => (
+                    <li key={q.id} className="border-b border-border last:border-b-0">
+                      <label className="flex items-start gap-2 p-3 cursor-pointer hover:bg-card">
+                        <input
+                          type="checkbox"
+                          checked={selectedQuestionIds.includes(q.id)}
+                          onChange={() => toggleQuestion(q.id)}
+                          className="mt-1 accent-accent"
+                        />
+                        <span className="text-sm text-text leading-snug">{q.questionText}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+      </fieldset>
+
       <div className="flex flex-wrap gap-2">
         <button
           type="submit"

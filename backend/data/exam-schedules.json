@@ -1,0 +1,13 @@
+[
+  {
+    "title": "General Knowledge - 01-Mar-2026",
+    "scheduledAt": "2026-03-01T10:30:00.000Z",
+    "durationMinutes": 60,
+    "questionIds": [
+      "67c27428-f904-4f0f-946e-474c65c4175b"
+    ],
+    "id": "f1e54b81-973f-4644-af5a-1c5a67af6e37",
+    "createdAt": "2026-02-28T06:38:49.368Z",
+    "createdBy": "62d15e49-01b7-42d1-9041-0d4f9618777b"
+  }
+]

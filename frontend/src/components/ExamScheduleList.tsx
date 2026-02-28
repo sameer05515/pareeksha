@@ -69,6 +69,9 @@ export function ExamScheduleList({
               {s.durationMinutes != null && (
                 <span className="ml-2"> · {s.durationMinutes} min</span>
               )}
+              {s.questionIds?.length ? (
+                <span className="ml-2"> · {s.questionIds.length} question(s)</span>
+              ) : null}
             </p>
           </div>
           <div className="flex items-center gap-2">
