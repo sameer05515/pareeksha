@@ -21,3 +21,7 @@ export interface UpdateExamScheduleBody {
   durationMinutes?: number
   questionIds?: string[]
 }
+
+export interface ExamScheduleWithRegistration extends ExamSchedule {
+  registered: boolean
+}

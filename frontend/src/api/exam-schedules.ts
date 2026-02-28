@@ -1,5 +1,10 @@
 import { getAuthHeaders } from '@/api/auth'
-import type { ExamSchedule, CreateExamScheduleBody, UpdateExamScheduleBody } from '@/types/exam-schedule'
+import type {
+  ExamSchedule,
+  CreateExamScheduleBody,
+  UpdateExamScheduleBody,
+  ExamScheduleWithRegistration,
+} from '@/types/exam-schedule'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
@@ -60,5 +65,42 @@ export async function deleteExamSchedule(id: string): Promise<void> {
   if (!res.ok) {
     const json = (await res.json()) as { message?: string }
     throw new Error(json?.message ?? 'Failed to delete exam schedule')
+  }
+}
+
+/** Student: upcoming exam schedules with registration status */
+export async function fetchUpcomingExamSchedules(): Promise<ExamScheduleWithRegistration[]> {
+  const res = await fetch(`${API_BASE}/api/exam-schedules/upcoming`, {
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) {
+    const err = (await res.json()) as { message?: string }
+    throw new Error(err?.message ?? 'Failed to load upcoming exams')
+  }
+  const json = (await res.json()) as { success: boolean; schedules: ExamScheduleWithRegistration[] }
+  return json.schedules ?? []
+}
+
+/** Student: register for an exam */
+export async function registerForExam(scheduleId: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/exam-schedules/${scheduleId}/register`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) {
+    const json = (await res.json()) as { message?: string }
+    throw new Error(json?.message ?? 'Failed to register')
+  }
+}
+
+/** Student: unregister from an exam */
+export async function unregisterFromExam(scheduleId: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/exam-schedules/${scheduleId}/register`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) {
+    const json = (await res.json()) as { message?: string }
+    throw new Error(json?.message ?? 'Failed to unregister')
   }
 }

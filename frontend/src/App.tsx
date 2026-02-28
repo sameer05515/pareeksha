@@ -9,6 +9,7 @@ import { ProfilePage } from '@/pages/ProfilePage'
 import { ChangePasswordPage } from '@/pages/ChangePasswordPage'
 import { QuestionsPage } from '@/pages/QuestionsPage'
 import { ExamSchedulesPage } from '@/pages/ExamSchedulesPage'
+import { UpcomingExamsPage } from '@/pages/UpcomingExamsPage'
 
 function AppRoutes() {
   return (
@@ -22,6 +23,7 @@ function AppRoutes() {
         <Route path="change-password" element={<ChangePasswordPage />} />
         <Route path="questions" element={<QuestionsPage />} />
         <Route path="exam-schedules" element={<ExamSchedulesPage />} />
+        <Route path="exams" element={<UpcomingExamsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

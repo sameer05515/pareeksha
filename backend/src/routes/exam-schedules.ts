@@ -8,6 +8,7 @@ import {
   updateExamSchedule,
   deleteExamSchedule,
 } from '../exam-schedules-store.js'
+import { isStudentRegistered, addRegistration, removeRegistration } from '../exam-registrations-store.js'
 import type { ExamSchedule, CreateExamScheduleBody, UpdateExamScheduleBody } from '../types/exam-schedule.js'
 
 export const examSchedulesRouter = Router()
@@ -102,6 +103,29 @@ examSchedulesRouter.get('/', (_req, res, next) => {
   }
 })
 
+// Student: upcoming exam schedules with registration status (must be before /:id)
+examSchedulesRouter.get('/upcoming', requireAuth, requireRole('student'), (req, res, next) => {
+  try {
+    const auth = res.locals.auth as AuthLocals
+    const studentId = auth.studentId
+    if (!studentId) {
+      res.status(403).json({ success: false, message: 'Student profile not linked' })
+      return
+    }
+    const now = new Date().toISOString()
+    const all = getAllExamSchedules()
+    const upcoming = all
+      .filter((s) => s.scheduledAt > now)
+      .map((s) => ({
+        ...s,
+        registered: isStudentRegistered(s.id, studentId),
+      }))
+    res.json({ success: true, schedules: upcoming })
+  } catch (err) {
+    next(err)
+  }
+})
+
 examSchedulesRouter.get('/:id', (req, res, next) => {
   try {
     const schedule = getExamScheduleById(req.params.id)
@@ -166,6 +190,55 @@ examSchedulesRouter.delete('/:id', requireAuth, requireRole('admin'), (req, res,
       return
     }
     res.json({ success: true, message: 'Exam schedule deleted' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Student: register for an exam
+examSchedulesRouter.post('/:id/register', requireAuth, requireRole('student'), (req, res, next) => {
+  try {
+    const auth = res.locals.auth as AuthLocals
+    const studentId = auth.studentId
+    if (!studentId) {
+      res.status(403).json({ success: false, message: 'Student profile not linked' })
+      return
+    }
+    const schedule = getExamScheduleById(req.params.id)
+    if (!schedule) {
+      res.status(404).json({ success: false, message: 'Exam schedule not found' })
+      return
+    }
+    if (schedule.scheduledAt <= new Date().toISOString()) {
+      res.status(400).json({ success: false, message: 'Cannot register for a past exam' })
+      return
+    }
+    const added = addRegistration(schedule.id, studentId)
+    if (!added) {
+      res.status(409).json({ success: false, message: 'Already registered for this exam' })
+      return
+    }
+    res.status(201).json({ success: true, message: 'Registered for exam' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Student: unregister from an exam
+examSchedulesRouter.delete('/:id/register', requireAuth, requireRole('student'), (req, res, next) => {
+  try {
+    const auth = res.locals.auth as AuthLocals
+    const studentId = auth.studentId
+    if (!studentId) {
+      res.status(403).json({ success: false, message: 'Student profile not linked' })
+      return
+    }
+    const removed = removeRegistration(req.params.id, studentId)
+    if (!removed) {
+      res.status(404).json({ success: false, message: 'Not registered for this exam' })
+      return
+    }
+    res.json({ success: true, message: 'Unregistered from exam' })
   } catch (err) {
     next(err)
   }
