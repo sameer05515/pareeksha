@@ -6,6 +6,7 @@ import swaggerUi from 'swagger-ui-express'
 import { studentsRouter } from './routes/students.js'
 import { authRouter } from './routes/auth.js'
 import { questionsRouter } from './routes/questions.js'
+import { examSchedulesRouter } from './routes/exam-schedules.js'
 
 const app = express()
 const PORT = Number(process.env.PORT) || 3000
@@ -53,6 +54,7 @@ app.get('/redoc', (_req, res) => {
 app.use('/api/auth', authRouter)
 app.use('/api/students', studentsRouter)
 app.use('/api/questions', questionsRouter)
+app.use('/api/exam-schedules', examSchedulesRouter)
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
@@ -70,10 +72,12 @@ async function start() {
   const { initStore } = await import('./store.js')
   const { initUsersStore, ensureDefaultAdmin } = await import('./users-store.js')
   const { initQuestionsStore } = await import('./questions-store.js')
+  const { initExamSchedulesStore } = await import('./exam-schedules-store.js')
   await initStore()
   initUsersStore()
   ensureDefaultAdmin()
   initQuestionsStore()
+  initExamSchedulesStore()
   app.listen(PORT, () => {
     console.log(`🚀 Pareeksha backend running at http://localhost:${PORT}`);
     console.log('🔁 OpenAPI spec: http://localhost:3000/openapi.json');
