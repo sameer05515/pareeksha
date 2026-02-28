@@ -14,7 +14,6 @@ import {
 } from '@/types/student'
 import { validateStudentForm, computeAge } from '@/utils/validation'
 import { registerStudent } from '@/api/students'
-import styles from './StudentRegistrationForm.module.css'
 
 const STEPS = 3
 
@@ -76,23 +75,24 @@ export function StudentRegistrationForm() {
     }
   }
 
-  // Digits-only handlers
   const digitsOnly = (name: keyof StudentFormData, value: string) => {
     update(name, value.replace(/\D/g, ''))
   }
 
   if (submitted) {
     return (
-      <div className={styles.successCard}>
-        <div className={styles.successIcon}>✓</div>
-        <h2 className={styles.successTitle}>Registration successful</h2>
-        <p className={styles.successText}>
+      <div className="text-center py-10 px-10 bg-card border border-border rounded">
+        <div className="w-16 h-16 mx-auto mb-4 bg-success/15 text-success text-2xl font-bold leading-[4rem] rounded-full">
+          ✓
+        </div>
+        <h2 className="text-2xl font-semibold m-0 mb-2">Registration successful</h2>
+        <p className="text-muted m-0 mb-6 max-w-[400px] mx-auto">
           Thank you, {formData.firstName}. Your student registration has been submitted. We will
           contact you at {formData.email} with further steps.
         </p>
         <button
           type="button"
-          className={styles.successButton}
+          className="py-2.5 px-5 bg-transparent text-accent border border-accent rounded font-medium hover:bg-accent hover:text-white"
           onClick={() => {
             setFormData(initialFormData)
             setConfirmPassword('')
@@ -108,20 +108,20 @@ export function StudentRegistrationForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form} noValidate>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8" noValidate>
       {submitError && (
-        <div className={styles.submitError} role="alert">
+        <div className="py-3 px-4 bg-red-500/10 border border-error rounded text-error text-sm" role="alert">
           {submitError}
         </div>
       )}
 
-      <p className={styles.progress}>
-        Step <span>{step + 1}</span> of {STEPS}
+      <p className="font-semibold m-0 mb-2">
+        Step <span className="text-accent">{step + 1}</span> of {STEPS}
       </p>
 
       {/* Step 1: Basic Details */}
-      <div className={styles.step} data-visible={step === 0}>
-        <h3 className={styles.sectionTitle}>Basic Details</h3>
+      <div className={step === 0 ? 'flex flex-col gap-4' : 'hidden'}>
+        <h3 className="text-base font-semibold text-accent m-0 mb-1 tracking-wide uppercase">Basic Details</h3>
         <FormSelect
           label="Preferred Language"
           name="preferredLanguage"
@@ -215,8 +215,8 @@ export function StudentRegistrationForm() {
       </div>
 
       {/* Step 2: School Details */}
-      <div className={styles.step} data-visible={step === 1}>
-        <h3 className={styles.sectionTitle}>School Details</h3>
+      <div className={step === 1 ? 'flex flex-col gap-4' : 'hidden'}>
+        <h3 className="text-base font-semibold text-accent m-0 mb-1 tracking-wide uppercase">School Details</h3>
         <FormField
           label="School Name & Address"
           name="schoolNameAndAddress"
@@ -256,8 +256,8 @@ export function StudentRegistrationForm() {
       </div>
 
       {/* Step 3: Address & Contact */}
-      <div className={styles.step} data-visible={step === 2}>
-        <h3 className={styles.sectionTitle}>Address & Contact</h3>
+      <div className={step === 2 ? 'flex flex-col gap-4' : 'hidden'}>
+        <h3 className="text-base font-semibold text-accent m-0 mb-1 tracking-wide uppercase">Address & Contact</h3>
         <FormField
           label="Address Line 1"
           name="addressLine1"
@@ -335,23 +335,23 @@ export function StudentRegistrationForm() {
         />
       </div>
 
-      <div className={styles.actions}>
+      <div className="flex flex-wrap gap-3 pt-2 justify-between">
         <button
           type="button"
-          className={styles.resetButton}
+          className="py-3 px-6 bg-transparent text-muted border border-border rounded font-medium hover:border-muted hover:text-zinc-100 disabled:opacity-60 disabled:cursor-not-allowed"
           onClick={handlePrev}
           disabled={step === 0 || loading}
         >
           Back
         </button>
         {step < STEPS - 1 ? (
-          <button type="button" className={styles.submitButton} onClick={handleNext}>
+          <button type="button" className="py-3 px-6 bg-accent text-white border-0 rounded font-semibold hover:bg-accent-hover" onClick={handleNext}>
             Next
           </button>
         ) : (
           <button
             type="submit"
-            className={styles.submitButton}
+            className="py-3 px-6 bg-accent text-white border-0 rounded font-semibold hover:bg-accent-hover disabled:opacity-60 disabled:cursor-not-allowed"
             disabled={loading}
             aria-busy={loading}
           >

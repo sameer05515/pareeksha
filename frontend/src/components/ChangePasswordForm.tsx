@@ -1,6 +1,5 @@
 import { useState, FormEvent } from 'react'
 import { changePassword } from '@/api/auth'
-import styles from './ChangePasswordForm.module.css'
 
 export function ChangePasswordForm() {
   const [currentPassword, setCurrentPassword] = useState('')
@@ -42,56 +41,60 @@ export function ChangePasswordForm() {
 
   if (success) {
     return (
-      <div className={styles.success}>
-        <p>Your password has been updated successfully.</p>
+      <div className="py-4 text-success">
+        <p className="m-0">Your password has been updated successfully.</p>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <h2 className={styles.title}>Change password</h2>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-[360px]">
+      <h2 className="m-0 mb-2 text-xl">Change password</h2>
       {error && (
-        <div className={styles.error} role="alert">
+        <div className="py-2 px-3 bg-red-500/10 border border-error rounded text-error text-sm" role="alert">
           {error}
         </div>
       )}
-      <label className={styles.label}>
+      <label className="flex flex-col gap-1.5 text-sm text-muted">
         Current password
         <input
           type="password"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
-          className={styles.input}
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
           required
           autoComplete="current-password"
         />
       </label>
-      <label className={styles.label}>
+      <label className="flex flex-col gap-1.5 text-sm text-muted">
         New password
         <input
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className={styles.input}
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
           required
           minLength={6}
           autoComplete="new-password"
         />
       </label>
-      <label className={styles.label}>
+      <label className="flex flex-col gap-1.5 text-sm text-muted">
         Confirm new password
         <input
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className={styles.input}
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
           required
           minLength={6}
           autoComplete="new-password"
         />
       </label>
-      <button type="submit" className={styles.submit} disabled={loading}>
+      <button
+        type="submit"
+        className="py-3 px-6 bg-accent text-white border-0 rounded font-semibold mt-1 hover:bg-accent-hover disabled:opacity-60 disabled:cursor-not-allowed"
+        disabled={loading}
+      >
         {loading ? 'Updating…' : 'Update password'}
       </button>
     </form>

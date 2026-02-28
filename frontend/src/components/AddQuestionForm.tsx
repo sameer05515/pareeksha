@@ -1,7 +1,5 @@
 import { useState, FormEvent } from 'react'
 import { createQuestion } from '@/api/questions'
-import type { CreateQuestionBody } from '@/types/question'
-import styles from './AddQuestionForm.module.css'
 
 const MIN_OPTIONS = 2
 const MAX_OPTIONS = 10
@@ -76,54 +74,54 @@ export function AddQuestionForm({ onSuccess }: { onSuccess?: () => void }) {
 
   if (success) {
     return (
-      <div className={styles.success}>
-        <p>Question added successfully.</p>
+      <div className="py-4 text-success">
+        <p className="m-0">Question added successfully.</p>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <h2 className={styles.title}>Add question</h2>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-[560px]">
+      <h2 className="m-0 mb-2 text-xl">Add question</h2>
       {error && (
-        <div className={styles.error} role="alert">
+        <div className="py-2 px-3 bg-red-500/10 border border-error rounded text-error text-sm" role="alert">
           {error}
         </div>
       )}
-      <label className={styles.label}>
+      <label className="flex flex-col gap-1.5 text-sm text-muted">
         Question
         <textarea
           value={questionText}
           onChange={(e) => setQuestionText(e.target.value)}
-          className={styles.textarea}
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 resize-y font-inherit focus:outline-none focus:border-border-focus"
           rows={3}
           required
           placeholder="Enter the question text"
         />
       </label>
-      <fieldset className={styles.optionsFieldset}>
-        <legend className={styles.legend}>Options (select correct answer)</legend>
+      <fieldset className="border border-border rounded p-4 m-0">
+        <legend className="text-sm text-muted px-2">Options (select correct answer)</legend>
         {options.map((opt, i) => (
-          <div key={i} className={styles.optionRow}>
+          <div key={i} className="flex items-center gap-2 mb-2">
             <input
               type="radio"
               name="correct"
               checked={correctIndex === i}
               onChange={() => setCorrectIndex(i)}
-              className={styles.radio}
+              className="shrink-0 accent-accent"
               aria-label={`Correct answer is option ${i + 1}`}
             />
             <input
               type="text"
               value={opt}
               onChange={(e) => setOptionAt(i, e.target.value)}
-              className={styles.optionInput}
+              className="flex-1 py-2 px-3 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
               placeholder={`Option ${i + 1}`}
             />
             <button
               type="button"
               onClick={() => removeOption(i)}
-              className={styles.removeBtn}
+              className="w-8 h-8 p-0 bg-transparent border border-border rounded text-muted text-xl leading-none shrink-0 hover:border-error hover:text-error disabled:opacity-40 disabled:cursor-not-allowed"
               disabled={options.length <= MIN_OPTIONS}
               aria-label="Remove option"
             >
@@ -132,12 +130,20 @@ export function AddQuestionForm({ onSuccess }: { onSuccess?: () => void }) {
           </div>
         ))}
         {options.length < MAX_OPTIONS && (
-          <button type="button" onClick={addOption} className={styles.addBtn}>
+          <button
+            type="button"
+            onClick={addOption}
+            className="mt-1 py-2 px-3 bg-transparent border border-dashed border-border rounded text-sm text-muted self-start hover:border-accent hover:text-accent"
+          >
             + Add option
           </button>
         )}
       </fieldset>
-      <button type="submit" className={styles.submit} disabled={loading}>
+      <button
+        type="submit"
+        className="py-3 px-6 bg-accent text-white border-0 rounded font-semibold self-start hover:bg-accent-hover disabled:opacity-60 disabled:cursor-not-allowed"
+        disabled={loading}
+      >
         {loading ? 'Adding…' : 'Add question'}
       </button>
     </form>

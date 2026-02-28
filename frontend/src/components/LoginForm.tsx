@@ -1,7 +1,6 @@
 import { useState, FormEvent } from 'react'
 import { login } from '@/api/auth'
 import type { AuthUser } from '@/api/auth'
-import styles from './LoginForm.module.css'
 
 interface LoginFormProps {
   onSuccess: (user: AuthUser, token: string) => void
@@ -32,36 +31,40 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <h2 className={styles.title}>Sign in</h2>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <h2 className="m-0 mb-2 text-xl">Sign in</h2>
       {error && (
-        <div className={styles.error} role="alert">
+        <div className="py-2 px-3 bg-red-500/10 border border-error rounded text-error text-sm" role="alert">
           {error}
         </div>
       )}
-      <label className={styles.label}>
+      <label className="flex flex-col gap-1.5 text-sm text-muted">
         Email
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className={styles.input}
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
           required
           autoComplete="email"
         />
       </label>
-      <label className={styles.label}>
+      <label className="flex flex-col gap-1.5 text-sm text-muted">
         Password
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className={styles.input}
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
           required
           autoComplete="current-password"
         />
       </label>
-      <button type="submit" className={styles.submit} disabled={loading}>
+      <button
+        type="submit"
+        className="py-3 px-6 bg-accent text-white border-0 rounded font-semibold mt-1 hover:bg-accent-hover disabled:opacity-60 disabled:cursor-not-allowed"
+        disabled={loading}
+      >
         {loading ? 'Signing in…' : 'Sign in'}
       </button>
     </form>

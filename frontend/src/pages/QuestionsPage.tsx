@@ -3,7 +3,6 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { AddQuestionForm } from '@/components/AddQuestionForm'
 import { QuestionsList } from '@/components/QuestionsList'
-import styles from './QuestionsPage.module.css'
 
 export function QuestionsPage() {
   const { user, isAuthenticated } = useAuth()
@@ -13,12 +12,12 @@ export function QuestionsPage() {
   if (user?.role !== 'admin') return <Navigate to="/" replace />
 
   return (
-    <div className={styles.page}>
-      <section className={styles.section}>
+    <div className="flex flex-col gap-8">
+      <section className="w-full">
         <AddQuestionForm onSuccess={() => setRefreshTrigger((r) => r + 1)} />
       </section>
-      <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>Existing questions</h3>
+      <section className="w-full">
+        <h3 className="text-base font-semibold text-accent m-0 mb-4 tracking-wide">Existing questions</h3>
         <QuestionsList refreshTrigger={refreshTrigger} />
       </section>
     </div>
