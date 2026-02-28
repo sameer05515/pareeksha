@@ -2,22 +2,34 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Pareeksha API",
-    "description": "Student registration and auth API with role-based access (student, admin, public).",
+    "description": "Student registration, exam scheduling, and assessment API with role-based access (student, admin, public).",
     "version": "1.0.0"
   },
   "servers": [
     { "url": "http://localhost:3000", "description": "Development" }
   ],
+  "tags": [
+    { "name": "Health", "description": "Service health" },
+    { "name": "Auth", "description": "Authentication" },
+    { "name": "Students", "description": "Student registration and profiles" },
+    { "name": "Questions", "description": "Question bank (admin)" },
+    { "name": "Exam Schedules", "description": "Exam scheduling and management" },
+    { "name": "Exam Attempts", "description": "Student exam attempts and results" }
+  ],
   "paths": {
     "/health": {
       "get": {
+        "tags": ["Health"],
         "summary": "Health check",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": { "type": "object", "properties": { "status": { "type": "string", "example": "ok" } } }
+                "schema": {
+                  "type": "object",
+                  "properties": { "status": { "type": "string", "example": "ok" } }
+                }
               }
             }
           }
@@ -26,6 +38,7 @@
     },
     "/api/auth/login": {
       "post": {
+        "tags": ["Auth"],
         "summary": "Login",
         "description": "Returns JWT and user. Use the token in `Authorization: Bearer <token>` for protected routes.",
         "requestBody": {
@@ -69,17 +82,14 @@
           },
           "401": {
             "description": "Invalid credentials",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" }
-              }
-            }
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
           }
         }
       }
     },
     "/api/auth/password": {
       "put": {
+        "tags": ["Auth"],
         "summary": "Change password",
         "description": "Update the authenticated user's password. Requires valid JWT.",
         "security": [{ "bearerAuth": [] }],
@@ -126,14 +136,13 @@
     },
     "/api/students/register": {
       "post": {
+        "tags": ["Students"],
         "summary": "Register student (public)",
         "description": "Creates a student record and a user with role `student`. No auth required.",
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/StudentRegistration" }
-            }
+            "application/json": { "schema": { "$ref": "#/components/schemas/StudentRegistration" } }
           }
         },
         "responses": {
@@ -163,7 +172,13 @@
                     "message": { "type": "string" },
                     "errors": {
                       "type": "array",
-                      "items": { "type": "object", "properties": { "field": { "type": "string" }, "message": { "type": "string" } } }
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": { "type": "string" },
+                          "message": { "type": "string" }
+                        }
+                      }
                     }
                   }
                 }
@@ -175,6 +190,7 @@
     },
     "/api/students/me": {
       "get": {
+        "tags": ["Students"],
         "summary": "Get my profile (student)",
         "description": "Returns the authenticated student's own record. Requires role `student`.",
         "security": [{ "bearerAuth": [] }],
@@ -193,13 +209,20 @@
               }
             }
           },
-          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
-          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
         }
       }
     },
     "/api/students": {
       "get": {
+        "tags": ["Students"],
         "summary": "List all students (admin)",
         "description": "Returns all registered students. Requires role `admin`.",
         "security": [{ "bearerAuth": [] }],
@@ -221,13 +244,20 @@
               }
             }
           },
-          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
-          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
         }
       }
     },
     "/api/students/{id}": {
       "get": {
+        "tags": ["Students"],
         "summary": "Get student by ID",
         "description": "Admin: any student. Student: own record only.",
         "security": [{ "bearerAuth": [] }],
@@ -249,9 +279,764 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "404": {
+            "description": "Not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      }
+    },
+    "/api/questions": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "List all questions",
+        "description": "Returns all questions in the bank. Public (no auth).",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "questions": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Question" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Create question (admin)",
+        "description": "Add a single question. Requires role `admin`.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateQuestionBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "question": { "$ref": "#/components/schemas/Question" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/questions/bulk": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Bulk create questions (admin)",
+        "description": "Add multiple questions at once. Requires role `admin`.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["questions"],
+                "properties": {
+                  "questions": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/CreateQuestionBody" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "count": { "type": "integer" },
+                    "questions": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Question" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "index": { "type": "integer" },
+                          "message": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/questions/{id}": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get question by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "question": { "$ref": "#/components/schemas/Question" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      }
+    },
+    "/api/exam-schedules": {
+      "get": {
+        "tags": ["Exam Schedules"],
+        "summary": "List all exam schedules",
+        "description": "Returns all exam schedules. Public (no auth).",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "schedules": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/ExamSchedule" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Exam Schedules"],
+        "summary": "Create exam schedule (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateExamScheduleBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "schedule": { "$ref": "#/components/schemas/ExamSchedule" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/exam-schedules/upcoming": {
+      "get": {
+        "tags": ["Exam Schedules"],
+        "summary": "List upcoming exams (student)",
+        "description": "Returns future and currently active exams with registration status. Requires role `student`.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "schedules": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          { "$ref": "#/components/schemas/ExamSchedule" },
+                          {
+                            "type": "object",
+                            "properties": { "registered": { "type": "boolean" } }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/exam-schedules/attempts/current": {
+      "get": {
+        "tags": ["Exam Attempts"],
+        "summary": "Get current active attempt (student)",
+        "description": "Returns the student's in-progress attempt with questions. Requires role `student`.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "attempt": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "startedAt": { "type": "string", "format": "date-time" }
+                      }
+                    },
+                    "schedule": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "title": { "type": "string" },
+                        "durationMinutes": { "type": "integer" }
+                      }
+                    },
+                    "questions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "questionText": { "type": "string" },
+                          "options": { "type": "array", "items": { "type": "string" } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "No active attempt or exam window closed", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/exam-schedules/attempts/start": {
+      "post": {
+        "tags": ["Exam Attempts"],
+        "summary": "Start exam attempt (student)",
+        "description": "Starts a new attempt for the given schedule. Student must be registered and exam window must be open.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["scheduleId"],
+                "properties": { "scheduleId": { "type": "string", "format": "uuid" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Attempt started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "attempt": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "startedAt": { "type": "string", "format": "date-time" }
+                      }
+                    },
+                    "schedule": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "title": { "type": "string" },
+                        "durationMinutes": { "type": "integer" }
+                      }
+                    },
+                    "questions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "questionText": { "type": "string" },
+                          "options": { "type": "array", "items": { "type": "string" } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "scheduleId required or exam not open", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Not registered or student profile not linked", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "404": { "description": "Schedule not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "409": { "description": "Already have an active attempt", "content": { "application/json": { "schema": { "type": "object", "properties": { "attemptId": { "type": "string" } } } } } }
+        }
+      }
+    },
+    "/api/exam-schedules/attempts/mine": {
+      "get": {
+        "tags": ["Exam Attempts"],
+        "summary": "List my submitted attempts (student)",
+        "description": "Returns all submitted exam attempts for the authenticated student.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "attempts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "examScheduleId": { "type": "string" },
+                          "scheduleTitle": { "type": "string" },
+                          "submittedAt": { "type": "string", "format": "date-time" },
+                          "score": { "type": "integer" },
+                          "total": { "type": "integer" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/exam-schedules/attempts/{attemptId}/submit": {
+      "post": {
+        "tags": ["Exam Attempts"],
+        "summary": "Submit exam attempt (student)",
+        "description": "Submits answers for an in-progress attempt. Body: `{ answers: { questionId: selectedOptionIndex } }`.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "attemptId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["answers"],
+                "properties": {
+                  "answers": {
+                    "type": "object",
+                    "additionalProperties": { "type": "integer", "minimum": 0 },
+                    "description": "Map of questionId to selected option index (0-based)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Submitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "attempt": { "$ref": "#/components/schemas/ExamAttempt" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "answers required or attempt already submitted", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "404": { "description": "Attempt not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/exam-schedules/attempts/{attemptId}/result": {
+      "get": {
+        "tags": ["Exam Attempts"],
+        "summary": "Get attempt result (student)",
+        "description": "Returns score and question-wise breakdown for a submitted attempt.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "attemptId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "schedule": { "type": "object", "properties": { "id": { "type": "string" }, "title": { "type": "string" } } },
+                    "attempt": { "type": "object", "properties": { "id": { "type": "string" }, "submittedAt": { "type": "string" } } },
+                    "score": { "type": "integer" },
+                    "total": { "type": "integer" },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "questionId": { "type": "string" },
+                          "questionText": { "type": "string" },
+                          "options": { "type": "array", "items": { "type": "string" } },
+                          "correctIndex": { "type": "integer" },
+                          "selectedIndex": { "type": "integer" },
+                          "correct": { "type": "boolean" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Attempt not yet submitted", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "404": { "description": "Attempt or schedule not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/exam-schedules/{id}": {
+      "get": {
+        "tags": ["Exam Schedules"],
+        "summary": "Get exam schedule by ID",
+        "description": "Returns schedule. When authenticated as admin, includes `hasAttempts` boolean.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "schedule": { "$ref": "#/components/schemas/ExamSchedule" },
+                    "hasAttempts": { "type": "boolean", "description": "Present when authenticated as admin" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Exam Schedules"],
+        "summary": "Update exam schedule (admin)",
+        "description": "If the exam has attempts, only title, scheduledAt, and durationMinutes can be updated; questionIds cannot be changed.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateExamScheduleBody" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "schedule": { "$ref": "#/components/schemas/ExamSchedule" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or questionIds change when exam has attempts",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
           "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
           "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
           "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Exam Schedules"],
+        "summary": "Delete exam schedule (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/exam-schedules/{id}/score-report": {
+      "get": {
+        "tags": ["Exam Schedules"],
+        "summary": "Get score and rank report (admin)",
+        "description": "Returns score and rank for all submitted attempts: all locations (combined) and school-wise.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "schedule": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "title": { "type": "string" },
+                        "scheduledAt": { "type": "string", "format": "date-time" }
+                      }
+                    },
+                    "allLocations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "rank": { "type": "integer" },
+                          "attemptId": { "type": "string" },
+                          "studentId": { "type": "string" },
+                          "studentName": { "type": "string" },
+                          "schoolNameAndAddress": { "type": "string" },
+                          "city": { "type": "string" },
+                          "state": { "type": "string" },
+                          "score": { "type": "integer" },
+                          "total": { "type": "integer" },
+                          "submittedAt": { "type": "string", "format": "date-time" }
+                        }
+                      }
+                    },
+                    "schoolWise": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "schoolNameAndAddress": { "type": "string" },
+                          "city": { "type": "string" },
+                          "state": { "type": "string" },
+                          "students": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "rank": { "type": "integer" },
+                                "attemptId": { "type": "string" },
+                                "studentId": { "type": "string" },
+                                "studentName": { "type": "string" },
+                                "score": { "type": "integer" },
+                                "total": { "type": "integer" },
+                                "submittedAt": { "type": "string" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/exam-schedules/{id}/register": {
+      "post": {
+        "tags": ["Exam Schedules"],
+        "summary": "Register for exam (student)",
+        "description": "Register the authenticated student for the exam. Cannot register for past exams.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "201": {
+            "description": "Registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Cannot register for past exam", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "404": { "description": "Schedule not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "409": { "description": "Already registered", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Exam Schedules"],
+        "summary": "Unregister from exam (student)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unregistered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "403": { "description": "Forbidden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "404": { "description": "Not registered", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     }
@@ -274,11 +1059,7 @@
       },
       "StudentRegistration": {
         "type": "object",
-        "required": [
-          "preferredLanguage", "adhaarNumber", "firstName", "lastName", "password",
-          "dateOfBirth", "gender", "schoolNameAndAddress", "schoolEnrollmentNumber",
-          "class", "board", "addressLine1", "city", "state", "country", "pincode", "email", "mobile"
-        ],
+        "required": ["preferredLanguage", "adhaarNumber", "firstName", "lastName", "password", "dateOfBirth", "gender", "schoolNameAndAddress", "schoolEnrollmentNumber", "class", "board", "addressLine1", "city", "state", "country", "pincode", "email", "mobile"],
         "properties": {
           "preferredLanguage": { "type": "string", "example": "English" },
           "adhaarNumber": { "type": "string", "minLength": 12, "maxLength": 12, "example": "123456789012" },
@@ -290,7 +1071,7 @@
           "gender": { "type": "string", "enum": ["Male", "Female", "Other"] },
           "schoolNameAndAddress": { "type": "string" },
           "schoolEnrollmentNumber": { "type": "string" },
-          "class": { "type": "string", "enum": ["1","2","3","4","5","6","7","8","9","10","11","12"] },
+          "class": { "type": "string", "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"] },
           "board": { "type": "string", "enum": ["CBSE", "ICSE", "State Board"] },
           "addressLine1": { "type": "string" },
           "addressLine2": { "type": "string" },
@@ -313,6 +1094,68 @@
             }
           }
         ]
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "questionText": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" } },
+          "correctIndex": { "type": "integer" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "createdBy": { "type": "string" }
+        }
+      },
+      "CreateQuestionBody": {
+        "type": "object",
+        "required": ["questionText", "options", "correctIndex"],
+        "properties": {
+          "questionText": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+          "correctIndex": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "ExamSchedule": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "scheduledAt": { "type": "string", "format": "date-time" },
+          "durationMinutes": { "type": "integer" },
+          "questionIds": { "type": "array", "items": { "type": "string" } },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "createdBy": { "type": "string" }
+        }
+      },
+      "CreateExamScheduleBody": {
+        "type": "object",
+        "required": ["title", "scheduledAt"],
+        "properties": {
+          "title": { "type": "string" },
+          "scheduledAt": { "type": "string", "format": "date-time" },
+          "durationMinutes": { "type": "integer", "minimum": 1, "maximum": 9999 },
+          "questionIds": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "UpdateExamScheduleBody": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "scheduledAt": { "type": "string", "format": "date-time" },
+          "durationMinutes": { "type": "integer", "minimum": 1, "maximum": 9999 },
+          "questionIds": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "ExamAttempt": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "examScheduleId": { "type": "string" },
+          "studentId": { "type": "string" },
+          "startedAt": { "type": "string", "format": "date-time" },
+          "submittedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "answers": { "type": "object", "additionalProperties": { "type": "integer" } }
+        }
       }
     }
   }
