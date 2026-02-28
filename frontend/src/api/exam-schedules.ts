@@ -20,7 +20,7 @@ export async function fetchExamSchedules(): Promise<ExamSchedule[]> {
   return json.schedules ?? []
 }
 
-export async function fetchExamScheduleById(id: string): Promise<ExamSchedule> {
+export async function fetchExamScheduleById(id: string): Promise<ExamSchedule & { hasAttempts?: boolean }> {
   const res = await fetch(`${API_BASE}/api/exam-schedules/${id}`, {
     headers: getAuthHeaders(),
   })
@@ -28,9 +28,9 @@ export async function fetchExamScheduleById(id: string): Promise<ExamSchedule> {
     const err = (await res.json()) as { message?: string }
     throw new Error(err?.message ?? 'Failed to load exam schedule')
   }
-  const json = (await res.json()) as { success: boolean; schedule: ExamSchedule }
+  const json = (await res.json()) as { success: boolean; schedule: ExamSchedule; hasAttempts?: boolean }
   if (!json.schedule) throw new Error('Invalid response')
-  return json.schedule
+  return { ...json.schedule, ...(json.hasAttempts !== undefined && { hasAttempts: json.hasAttempts }) }
 }
 
 export async function createExamSchedule(data: CreateExamScheduleBody): Promise<ExamSchedule> {

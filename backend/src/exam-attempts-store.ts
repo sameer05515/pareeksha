@@ -28,6 +28,11 @@ export function getAttemptById(id: string): ExamAttempt | undefined {
   return attempts.find((a) => a.id === id)
 }
 
+/** True if any attempt exists for this exam schedule (submitted or in progress). */
+export function hasAttemptsForSchedule(examScheduleId: string): boolean {
+  return attempts.some((a) => a.examScheduleId === examScheduleId)
+}
+
 export function getActiveAttemptByStudent(studentId: string): ExamAttempt | undefined {
   return attempts.find((a) => a.studentId === studentId && !a.submittedAt)
 }

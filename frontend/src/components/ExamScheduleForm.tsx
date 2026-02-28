@@ -30,11 +30,12 @@ export function ExamScheduleForm({
   onSuccess,
   onCancelEdit,
 }: {
-  editing?: ExamSchedule | null
+  editing?: (ExamSchedule & { hasAttempts?: boolean }) | null
   onSuccess?: () => void
   onCancelEdit?: () => void
 }) {
   const isEdit = !!editing
+  const questionsLocked = isEdit && !!editing?.hasAttempts
   const [title, setTitle] = useState(editing?.title ?? '')
   const [datetimeLocal, setDatetimeLocal] = useState(editing ? toLocalDatetime(editing.scheduledAt) : '')
   const [durationMinutes, setDurationMinutes] = useState<string>(
@@ -127,12 +128,13 @@ export function ExamScheduleForm({
     setLoading(true)
     try {
       if (isEdit && editing) {
-        await updateExamSchedule(editing.id, {
+        const updatePayload: Parameters<typeof updateExamSchedule>[1] = {
           title: body.title,
           scheduledAt: body.scheduledAt,
           durationMinutes: body.durationMinutes,
-          questionIds: body.questionIds,
-        })
+        }
+        if (!questionsLocked) updatePayload.questionIds = selectedQuestionIds.length > 0 ? selectedQuestionIds : undefined
+        await updateExamSchedule(editing.id, updatePayload)
       } else {
         await createExamSchedule(body)
       }
@@ -193,8 +195,13 @@ export function ExamScheduleForm({
         />
       </label>
 
-      <fieldset className="border border-border rounded p-4 m-0">
+      <fieldset className="border border-border rounded p-4 m-0" disabled={questionsLocked}>
         <legend className="text-sm text-muted px-2">Questions (optional)</legend>
+        {questionsLocked && (
+          <p className="text-sm text-amber-600 dark:text-amber-400 mb-3 m-0">
+            This exam has been attempted. Only rescheduling (title, date, duration) is allowed. Questions cannot be edited.
+          </p>
+        )}
         <div className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <input

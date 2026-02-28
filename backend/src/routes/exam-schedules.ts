@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { randomUUID } from 'node:crypto'
-import { requireAuth, requireRole, type AuthLocals } from '../middleware/auth.js'
+import { requireAuth, requireRole, optionalAuth, type AuthLocals } from '../middleware/auth.js'
 import {
   getAllExamSchedules,
   getExamScheduleById,
@@ -9,7 +9,7 @@ import {
   deleteExamSchedule,
 } from '../exam-schedules-store.js'
 import { isStudentRegistered, addRegistration, removeRegistration } from '../exam-registrations-store.js'
-import { getActiveAttemptByStudent, createAttempt, getAttemptById, submitAttempt, getSubmittedAttemptsByStudent } from '../exam-attempts-store.js'
+import { getActiveAttemptByStudent, createAttempt, getAttemptById, submitAttempt, getSubmittedAttemptsByStudent, hasAttemptsForSchedule } from '../exam-attempts-store.js'
 import { getQuestionsByIds } from '../questions-store.js'
 import type { ExamSchedule, CreateExamScheduleBody, UpdateExamScheduleBody } from '../types/exam-schedule.js'
 
@@ -357,14 +357,18 @@ examSchedulesRouter.get('/upcoming', requireAuth, requireRole('student'), (req, 
   }
 })
 
-examSchedulesRouter.get('/:id', (req, res, next) => {
+examSchedulesRouter.get('/:id', optionalAuth, (req, res, next) => {
   try {
     const schedule = getExamScheduleById(req.params.id)
     if (!schedule) {
       res.status(404).json({ success: false, message: 'Exam schedule not found' })
       return
     }
-    res.json({ success: true, schedule })
+    const auth = res.locals.auth as AuthLocals | undefined
+    const isAdmin = auth?.role === 'admin'
+    const payload: { success: true; schedule: ExamSchedule; hasAttempts?: boolean } = { success: true, schedule }
+    if (isAdmin) payload.hasAttempts = hasAttemptsForSchedule(schedule.id)
+    res.json(payload)
   } catch (err) {
     next(err)
   }
@@ -402,11 +406,35 @@ examSchedulesRouter.put('/:id', requireAuth, requireRole('admin'), (req, res, ne
       res.status(400).json({ success: false, message: 'No fields to update' })
       return
     }
-    const updated = updateExamSchedule(req.params.id, result.data)
-    if (!updated) {
+    const scheduleId = req.params.id
+    const existing = getExamScheduleById(scheduleId)
+    if (!existing) {
       res.status(404).json({ success: false, message: 'Exam schedule not found' })
       return
     }
+    // If any user has attempted this exam, only rescheduling is allowed; questions list cannot be edited.
+    if (hasAttemptsForSchedule(scheduleId)) {
+      if (result.data.questionIds !== undefined) {
+        res.status(400).json({
+          success: false,
+          message: 'This exam has been attempted. Only rescheduling (title, scheduledAt, durationMinutes) is allowed. The questions list cannot be edited.',
+        })
+        return
+      }
+      // Strip to reschedule fields only
+      const rescheduleOnly: UpdateExamScheduleBody = {}
+      if (result.data.title !== undefined) rescheduleOnly.title = result.data.title
+      if (result.data.scheduledAt !== undefined) rescheduleOnly.scheduledAt = result.data.scheduledAt
+      if (result.data.durationMinutes !== undefined) rescheduleOnly.durationMinutes = result.data.durationMinutes
+      if (Object.keys(rescheduleOnly).length === 0) {
+        res.status(400).json({ success: false, message: 'No fields to update' })
+        return
+      }
+      const updated = updateExamSchedule(scheduleId, rescheduleOnly)
+      res.json({ success: true, message: 'Exam schedule updated (reschedule only)', schedule: updated })
+      return
+    }
+    const updated = updateExamSchedule(scheduleId, result.data)
     res.json({ success: true, message: 'Exam schedule updated', schedule: updated })
   } catch (err) {
     next(err)

@@ -3,12 +3,19 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { ExamScheduleForm } from '@/components/ExamScheduleForm'
 import { ExamScheduleList } from '@/components/ExamScheduleList'
+import { fetchExamScheduleById } from '@/api/exam-schedules'
 import type { ExamSchedule } from '@/types/exam-schedule'
 
 export function ExamSchedulesPage() {
   const { user, isAuthenticated } = useAuth()
   const [refreshTrigger, setRefreshTrigger] = useState(0)
-  const [editing, setEditing] = useState<ExamSchedule | null>(null)
+  const [editing, setEditing] = useState<(ExamSchedule & { hasAttempts?: boolean }) | null>(null)
+
+  const handleEdit = (schedule: ExamSchedule) => {
+    fetchExamScheduleById(schedule.id)
+      .then(setEditing)
+      .catch(() => setEditing({ ...schedule }))
+  }
 
   if (!isAuthenticated) return <Navigate to="/login" replace />
   if (user?.role !== 'admin') return <Navigate to="/" replace />
@@ -27,7 +34,7 @@ export function ExamSchedulesPage() {
       </section>
       <section className="w-full">
         <h3 className="text-base font-semibold text-accent m-0 mb-4 tracking-wide">Scheduled exams</h3>
-        <ExamScheduleList refreshTrigger={refreshTrigger} onEdit={setEditing} />
+        <ExamScheduleList refreshTrigger={refreshTrigger} onEdit={handleEdit} />
       </section>
     </div>
   )

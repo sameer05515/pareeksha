@@ -1,10 +1,12 @@
 [
   {
     "title": "General Knowledge - 01-Mar-2026",
-    "scheduledAt": "2026-03-01T10:30:00.000Z",
+    "scheduledAt": "2026-02-28T06:41:00.000Z",
     "durationMinutes": 60,
     "questionIds": [
-      "67c27428-f904-4f0f-946e-474c65c4175b"
+      "67c27428-f904-4f0f-946e-474c65c4175b",
+      "b3a11e90-3e52-43be-851e-5d45effca639",
+      "d4db134d-8220-4a71-9617-6b734ea8edef"
     ],
     "id": "f1e54b81-973f-4644-af5a-1c5a67af6e37",
     "createdAt": "2026-02-28T06:38:49.368Z",

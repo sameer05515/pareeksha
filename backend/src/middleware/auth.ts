@@ -52,6 +52,33 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
   next()
 }
 
+/** Sets res.locals.auth when a valid token is present; does not 401 when missing. */
+export function optionalAuth(req: Request, res: Response, next: NextFunction): void {
+  const authHeader = req.headers.authorization
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+  if (!token) {
+    next()
+    return
+  }
+  const payload = verifyToken(token)
+  if (!payload) {
+    next()
+    return
+  }
+  const user = getUserById(payload.sub)
+  if (!user) {
+    next()
+    return
+  }
+  res.locals.auth = {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    studentId: user.studentId,
+  } as AuthLocals
+  next()
+}
+
 export function requireRole(...allowed: Role[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const auth = res.locals.auth as AuthLocals | undefined

@@ -22,5 +22,17 @@
       "aac6a5f2-87a4-4e8a-935b-09ff67bdfa97": 1,
       "e286d5d8-1fdc-46b2-8491-7184899a650e": 1
     }
+  },
+  {
+    "id": "95b8b64f-bc0e-4674-835b-99dc0b83b2ea",
+    "examScheduleId": "f1e54b81-973f-4644-af5a-1c5a67af6e37",
+    "studentId": "c6400243-10d1-4d6b-924b-69d7bf7f6127",
+    "startedAt": "2026-02-28T07:40:44.221Z",
+    "submittedAt": "2026-02-28T07:40:57.281Z",
+    "answers": {
+      "67c27428-f904-4f0f-946e-474c65c4175b": 3,
+      "b3a11e90-3e52-43be-851e-5d45effca639": 2,
+      "d4db134d-8220-4a71-9617-6b734ea8edef": 2
+    }
   }
 ]
