@@ -12,3 +12,7 @@ export interface CreateQuestionBody {
   options: string[]
   correctIndex: number
 }
+
+export interface BulkCreateQuestionsBody {
+  questions: CreateQuestionBody[]
+}

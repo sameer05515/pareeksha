@@ -18,11 +18,30 @@ export async function fetchQuestions(): Promise<Question[]> {
 export async function createQuestion(data: CreateQuestionBody): Promise<Question> {
   const res = await fetch(`${API_BASE}/api/questions`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
   const json = (await res.json()) as { success: boolean; message?: string; question?: Question }
   if (!res.ok) throw new Error(json?.message ?? 'Failed to add question')
   if (!json.question) throw new Error('Invalid response')
   return json.question
+}
+
+export interface BulkCreateResponse {
+  success: boolean
+  message?: string
+  count?: number
+  questions?: Question[]
+  errors?: { index: number; message: string }[]
+}
+
+export async function createQuestionsBulk(questions: CreateQuestionBody[]): Promise<BulkCreateResponse> {
+  const res = await fetch(`${API_BASE}/api/questions/bulk`, {
+    method: 'POST',
+    headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ questions }),
+  })
+  const json = (await res.json()) as BulkCreateResponse
+  if (!res.ok) return json
+  return json
 }
