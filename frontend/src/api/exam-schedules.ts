@@ -216,3 +216,48 @@ export async function getMyAttempts(): Promise<MyAttemptItem[]> {
   const json = (await res.json()) as { success: boolean; attempts: MyAttemptItem[] }
   return json.attempts ?? []
 }
+
+// --- Admin: Score & rank report ---
+
+export interface ScoreReportRow {
+  rank: number
+  attemptId: string
+  studentId: string
+  studentName: string
+  schoolNameAndAddress: string
+  city: string
+  state: string
+  score: number
+  total: number
+  submittedAt: string
+}
+
+export interface ScoreReportSchoolGroup {
+  schoolNameAndAddress: string
+  city: string
+  state: string
+  students: ScoreReportRow[]
+}
+
+export interface ScoreReportResponse {
+  schedule: { id: string; title: string; scheduledAt: string }
+  allLocations: ScoreReportRow[]
+  schoolWise: ScoreReportSchoolGroup[]
+}
+
+/** Admin: get score and rank report for an exam (all locations + school-wise) */
+export async function getScoreReport(scheduleId: string): Promise<ScoreReportResponse> {
+  const res = await fetch(`${API_BASE}/api/exam-schedules/${scheduleId}/score-report`, {
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) {
+    const err = (await res.json()) as { message?: string }
+    throw new Error(err?.message ?? 'Failed to load score report')
+  }
+  const json = (await res.json()) as { success: boolean; schedule: ScoreReportResponse['schedule']; allLocations: ScoreReportRow[]; schoolWise: ScoreReportSchoolGroup[] }
+  return {
+    schedule: json.schedule,
+    allLocations: json.allLocations ?? [],
+    schoolWise: json.schoolWise ?? [],
+  }
+}

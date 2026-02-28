@@ -74,6 +74,7 @@ export function Sidebar() {
                 <NavLink to="/students" className={linkClass} end>All students</NavLink>
                 <NavLink to="/questions" className={linkClass} end>Questions</NavLink>
                 <NavLink to="/exam-schedules" className={linkClass} end>Exam schedule</NavLink>
+                <NavLink to="/admin/score-report" className={linkClass} end>Score &amp; rank report</NavLink>
               </>
             )}
             {user?.role === 'student' && (

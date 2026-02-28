@@ -33,6 +33,13 @@ export function hasAttemptsForSchedule(examScheduleId: string): boolean {
   return attempts.some((a) => a.examScheduleId === examScheduleId)
 }
 
+/** All submitted attempts for an exam schedule, newest first. */
+export function getSubmittedAttemptsBySchedule(examScheduleId: string): ExamAttempt[] {
+  return attempts
+    .filter((a) => a.examScheduleId === examScheduleId && a.submittedAt != null)
+    .sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''))
+}
+
 export function getActiveAttemptByStudent(studentId: string): ExamAttempt | undefined {
   return attempts.find((a) => a.studentId === studentId && !a.submittedAt)
 }

@@ -9,8 +9,9 @@ import {
   deleteExamSchedule,
 } from '../exam-schedules-store.js'
 import { isStudentRegistered, addRegistration, removeRegistration } from '../exam-registrations-store.js'
-import { getActiveAttemptByStudent, createAttempt, getAttemptById, submitAttempt, getSubmittedAttemptsByStudent, hasAttemptsForSchedule } from '../exam-attempts-store.js'
+import { getActiveAttemptByStudent, createAttempt, getAttemptById, submitAttempt, getSubmittedAttemptsByStudent, hasAttemptsForSchedule, getSubmittedAttemptsBySchedule } from '../exam-attempts-store.js'
 import { getQuestionsByIds } from '../questions-store.js'
+import { getStudentById } from '../store.js'
 import type { ExamSchedule, CreateExamScheduleBody, UpdateExamScheduleBody } from '../types/exam-schedule.js'
 
 export const examSchedulesRouter = Router()
@@ -352,6 +353,97 @@ examSchedulesRouter.get('/upcoming', requireAuth, requireRole('student'), (req, 
         registered: isStudentRegistered(s.id, studentId),
       }))
     res.json({ success: true, schedules: upcoming })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Admin: score and rank report for an exam (all locations + school-wise) — must be before GET /:id
+examSchedulesRouter.get('/:id/score-report', requireAuth, requireRole('admin'), async (req, res, next) => {
+  try {
+    const scheduleId = req.params.id
+    const schedule = getExamScheduleById(scheduleId)
+    if (!schedule) {
+      res.status(404).json({ success: false, message: 'Exam schedule not found' })
+      return
+    }
+    const attempts = getSubmittedAttemptsBySchedule(scheduleId)
+    const questionIds = schedule.questionIds?.length ? schedule.questionIds : []
+    const questions = questionIds.length ? getQuestionsByIds(questionIds) : []
+    const totalMarks = questions.length
+
+    type Row = {
+      attemptId: string
+      studentId: string
+      studentName: string
+      schoolNameAndAddress: string
+      city: string
+      state: string
+      score: number
+      total: number
+      submittedAt: string
+    }
+
+    const rows: Row[] = []
+    for (const attempt of attempts) {
+      if (!attempt.answers) continue
+      let score = 0
+      for (const q of questions) {
+        if (attempt.answers[q.id] === q.correctIndex) score += 1
+      }
+      const student = await getStudentById(attempt.studentId)
+      const nameParts = student ? [student.firstName, student.middleName, student.lastName].filter(Boolean) : []
+      const studentName = nameParts.length ? nameParts.join(' ').trim() : attempt.studentId
+      rows.push({
+        attemptId: attempt.id,
+        studentId: attempt.studentId,
+        studentName,
+        schoolNameAndAddress: student?.schoolNameAndAddress ?? '—',
+        city: student?.city ?? '—',
+        state: student?.state ?? '—',
+        score,
+        total: totalMarks,
+        submittedAt: attempt.submittedAt ?? '',
+      })
+    }
+
+    // All locations: sort by score desc, then submittedAt asc (earlier first for tie-break), assign rank
+    const byScoreDesc = [...rows].sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score
+      return (a.submittedAt || '').localeCompare(b.submittedAt || '')
+    })
+    const allLocations = byScoreDesc.map((r, i) => ({ ...r, rank: i + 1 }))
+
+    // School-wise: group by schoolNameAndAddress, within each group sort by score desc and assign rank
+    const schoolMap = new Map<string, Row[]>()
+    for (const r of rows) {
+      const key = (r.schoolNameAndAddress || '').trim() || '(No school)'
+      if (!schoolMap.has(key)) schoolMap.set(key, [])
+      schoolMap.get(key)!.push(r)
+    }
+    const schoolWise: { schoolNameAndAddress: string; city: string; state: string; students: Array<Row & { rank: number }> }[] = []
+    for (const [schoolNameAndAddress, students] of schoolMap) {
+      const sorted = [...students].sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score
+        return (a.submittedAt || '').localeCompare(b.submittedAt || '')
+      })
+      const withRank = sorted.map((r, i) => ({ ...r, rank: i + 1 }))
+      const firstRow = sorted[0]
+      schoolWise.push({
+        schoolNameAndAddress: schoolNameAndAddress === '(No school)' ? '' : schoolNameAndAddress,
+        city: firstRow?.city ?? '—',
+        state: firstRow?.state ?? '—',
+        students: withRank,
+      })
+    }
+    schoolWise.sort((a, b) => a.schoolNameAndAddress.localeCompare(b.schoolNameAndAddress))
+
+    res.json({
+      success: true,
+      schedule: { id: schedule.id, title: schedule.title, scheduledAt: schedule.scheduledAt },
+      allLocations,
+      schoolWise,
+    })
   } catch (err) {
     next(err)
   }

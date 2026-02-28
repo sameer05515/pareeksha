@@ -13,6 +13,7 @@ import { UpcomingExamsPage } from '@/pages/UpcomingExamsPage'
 import { ExamAttemptPage } from '@/pages/ExamAttemptPage'
 import { ExamResultPage } from '@/pages/ExamResultPage'
 import { AttemptedExamsPage } from '@/pages/AttemptedExamsPage'
+import { ScoreReportPage } from '@/pages/ScoreReportPage'
 
 function AppRoutes() {
   return (
@@ -27,6 +28,7 @@ function AppRoutes() {
         <Route path="change-password" element={<ChangePasswordPage />} />
         <Route path="questions" element={<QuestionsPage />} />
         <Route path="exam-schedules" element={<ExamSchedulesPage />} />
+        <Route path="admin/score-report" element={<ScoreReportPage />} />
         <Route path="exams" element={<UpcomingExamsPage />} />
         <Route path="exams/attempted" element={<AttemptedExamsPage />} />
         <Route path="exam/result/:attemptId" element={<ExamResultPage />} />
