@@ -9,9 +9,41 @@
   {
     "id": "eecfa3ed-f6e0-4a84-a215-518e5e524e8d",
     "email": "premendra.bce05515@gmail.com",
-    "passwordHash": "$2a$10$kjaeHDUdORFAr3IJgUYHMu2Ku4QBBVQlY3OQUBHWIeooeYHhpsn5u",
+    "passwordHash": "$2a$10$icMH84fnC1SCw2eMGL72e.WkUXx8YVPqoyJO0frMRBj8Vfndc464m",
     "role": "student",
     "studentId": "c6400243-10d1-4d6b-924b-69d7bf7f6127",
     "createdAt": "2026-02-27T12:26:54.368Z"
+  },
+  {
+    "id": "dd27a959-2cfe-4639-aaa1-69adf8311a04",
+    "email": "anjali.verma@gmail.com",
+    "passwordHash": "$2a$10$icMH84fnC1SCw2eMGL72e.WkUXx8YVPqoyJO0frMRBj8Vfndc464m",
+    "role": "student",
+    "studentId": "b18230b4-ef39-4df7-9c1a-62ea712acef6",
+    "createdAt": "2026-02-28T09:15:10.350Z"
+  },
+  {
+    "id": "8dfff463-4867-4cdc-9227-e8fce3553f28",
+    "email": "rahulrsingh@yahoo.com",
+    "passwordHash": "$2a$10$icMH84fnC1SCw2eMGL72e.WkUXx8YVPqoyJO0frMRBj8Vfndc464m",
+    "role": "student",
+    "studentId": "7f3410ee-49d9-4056-94be-cefda046d2aa",
+    "createdAt": "2026-02-28T09:20:17.777Z"
+  },
+  {
+    "id": "c8a353f5-b927-426f-9ade-49863a0b9942",
+    "email": "priya.sharma98@mail.com",
+    "passwordHash": "$2a$10$icMH84fnC1SCw2eMGL72e.WkUXx8YVPqoyJO0frMRBj8Vfndc464m",
+    "role": "student",
+    "studentId": "0bc5b7b3-c8ef-4506-ae46-042f27267d32",
+    "createdAt": "2026-02-28T09:23:41.112Z"
+  },
+  {
+    "id": "1c0183c5-0881-45be-a358-fb564ea30a45",
+    "email": "sourabh.mishra@davps.com",
+    "passwordHash": "$2a$10$icMH84fnC1SCw2eMGL72e.WkUXx8YVPqoyJO0frMRBj8Vfndc464m",
+    "role": "student",
+    "studentId": "6d279ce2-fc3e-4986-91b0-7849cb73e211",
+    "createdAt": "2026-02-28T09:26:54.921Z"
   }
 ]
