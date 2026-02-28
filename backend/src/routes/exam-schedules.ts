@@ -240,6 +240,7 @@ examSchedulesRouter.post('/attempts/:attemptId/submit', requireAuth, requireRole
 })
 
 // Student: upcoming exam schedules with registration status (must be before /:id)
+// Includes both future exams (scheduledAt > now) and currently active exams (in time window) so "Start exam" stays visible
 examSchedulesRouter.get('/upcoming', requireAuth, requireRole('student'), (req, res, next) => {
   try {
     const auth = res.locals.auth as AuthLocals
@@ -251,7 +252,10 @@ examSchedulesRouter.get('/upcoming', requireAuth, requireRole('student'), (req, 
     const now = new Date().toISOString()
     const all = getAllExamSchedules()
     const upcoming = all
-      .filter((s) => s.scheduledAt > now)
+      .filter((s) => {
+        if (s.scheduledAt > now) return true // future
+        return isExamWindowOpen(s) // currently in exam window
+      })
       .map((s) => ({
         ...s,
         registered: isStudentRegistered(s.id, studentId),
