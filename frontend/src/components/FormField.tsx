@@ -8,7 +8,7 @@ interface FormFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'cl
 }
 
 const inputBase =
-  'py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 placeholder:text-muted/70 transition-colors hover:border-zinc-600 focus:outline-none focus:border-border-focus focus:ring-[3px] focus:ring-indigo-500/20'
+  'py-2.5 px-3.5 bg-input border border-border rounded text-text placeholder:text-muted/70 transition-colors hover:border-zinc-600 focus:outline-none focus:border-border-focus focus:ring-[3px] focus:ring-indigo-500/20'
 const inputError = 'border-error focus:border-error focus:ring-red-500/20'
 
 export function FormField({ label, name, error, hint, id, ...props }: FormFieldProps) {

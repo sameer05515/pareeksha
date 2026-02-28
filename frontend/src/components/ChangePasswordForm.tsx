@@ -61,7 +61,7 @@ export function ChangePasswordForm() {
           type="password"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
-          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
           required
           autoComplete="current-password"
         />
@@ -72,7 +72,7 @@ export function ChangePasswordForm() {
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
           required
           minLength={6}
           autoComplete="new-password"
@@ -84,7 +84,7 @@ export function ChangePasswordForm() {
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
           required
           minLength={6}
           autoComplete="new-password"

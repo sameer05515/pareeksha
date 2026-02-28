@@ -42,7 +42,7 @@ export function QuestionsList({ refreshTrigger }: { refreshTrigger?: number }) {
               <span className="font-semibold text-accent text-sm">Q{i + 1}</span>
               <span className="text-xs text-muted">{formatDate(q.createdAt)}</span>
             </div>
-            <p className="m-0 mb-3 text-base leading-relaxed">{q.questionText}</p>
+            <p className="m-0 mb-3 leading-relaxed">{q.questionText}</p>
             <ul className="m-0 pl-5 list-none">
               {q.options.map((opt, j) => (
                 <li

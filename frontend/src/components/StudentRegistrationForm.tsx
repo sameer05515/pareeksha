@@ -338,7 +338,7 @@ export function StudentRegistrationForm() {
       <div className="flex flex-wrap gap-3 pt-2 justify-between">
         <button
           type="button"
-          className="py-3 px-6 bg-transparent text-muted border border-border rounded font-medium hover:border-muted hover:text-zinc-100 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="py-3 px-6 bg-transparent text-muted border border-border rounded font-medium hover:border-muted hover:text-text disabled:opacity-60 disabled:cursor-not-allowed"
           onClick={handlePrev}
           disabled={step === 0 || loading}
         >

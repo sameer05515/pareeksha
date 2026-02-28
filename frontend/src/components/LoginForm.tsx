@@ -44,7 +44,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
           required
           autoComplete="email"
         />
@@ -55,7 +55,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
           required
           autoComplete="current-password"
         />

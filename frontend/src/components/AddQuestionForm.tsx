@@ -93,7 +93,7 @@ export function AddQuestionForm({ onSuccess }: { onSuccess?: () => void }) {
         <textarea
           value={questionText}
           onChange={(e) => setQuestionText(e.target.value)}
-          className="py-2.5 px-3.5 bg-input border border-border rounded text-zinc-100 resize-y font-inherit focus:outline-none focus:border-border-focus"
+          className="py-2.5 px-3.5 bg-input border border-border rounded text-text resize-y font-inherit focus:outline-none focus:border-border-focus"
           rows={3}
           required
           placeholder="Enter the question text"
@@ -115,7 +115,7 @@ export function AddQuestionForm({ onSuccess }: { onSuccess?: () => void }) {
               type="text"
               value={opt}
               onChange={(e) => setOptionAt(i, e.target.value)}
-              className="flex-1 py-2 px-3 bg-input border border-border rounded text-zinc-100 focus:outline-none focus:border-border-focus"
+              className="flex-1 py-2 px-3 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
               placeholder={`Option ${i + 1}`}
             />
             <button

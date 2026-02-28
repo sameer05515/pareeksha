@@ -17,7 +17,7 @@ export function QuestionsPage() {
         <AddQuestionForm onSuccess={() => setRefreshTrigger((r) => r + 1)} />
       </section>
       <section className="w-full">
-        <h3 className="text-base font-semibold text-accent m-0 mb-4 tracking-wide">Existing questions</h3>
+        <h3 className=" font-semibold text-accent m-0 mb-4 tracking-wide">Existing questions</h3>
         <QuestionsList refreshTrigger={refreshTrigger} />
       </section>
     </div>
