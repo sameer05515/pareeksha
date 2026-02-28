@@ -104,3 +104,57 @@ export async function unregisterFromExam(scheduleId: string): Promise<void> {
     throw new Error(json?.message ?? 'Failed to unregister')
   }
 }
+
+/** Attempt: question without correct answer (for student view) */
+export interface AttemptQuestion {
+  id: string
+  questionText: string
+  options: string[]
+}
+
+export interface ActiveAttemptResponse {
+  attempt: { id: string; startedAt: string }
+  schedule: { id: string; title: string; durationMinutes: number }
+  questions: AttemptQuestion[]
+}
+
+/** Student: get current active attempt */
+export async function getCurrentAttempt(): Promise<ActiveAttemptResponse> {
+  const res = await fetch(`${API_BASE}/api/exam-schedules/attempts/current`, {
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) {
+    const json = (await res.json()) as { message?: string }
+    throw new Error(json?.message ?? 'No active attempt')
+  }
+  const json = (await res.json()) as { success: boolean; attempt: ActiveAttemptResponse['attempt']; schedule: ActiveAttemptResponse['schedule']; questions: AttemptQuestion[] }
+  return { attempt: json.attempt, schedule: json.schedule, questions: json.questions ?? [] }
+}
+
+/** Student: start a new attempt */
+export async function startAttempt(scheduleId: string): Promise<ActiveAttemptResponse> {
+  const res = await fetch(`${API_BASE}/api/exam-schedules/attempts/start`, {
+    method: 'POST',
+    headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ scheduleId }),
+  })
+  if (!res.ok) {
+    const json = (await res.json()) as { message?: string }
+    throw new Error(json?.message ?? 'Failed to start attempt')
+  }
+  const json = (await res.json()) as { success: boolean; attempt: ActiveAttemptResponse['attempt']; schedule: ActiveAttemptResponse['schedule']; questions: AttemptQuestion[] }
+  return { attempt: json.attempt, schedule: json.schedule, questions: json.questions ?? [] }
+}
+
+/** Student: submit attempt answers */
+export async function submitAttemptAnswers(attemptId: string, answers: Record<string, number>): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/exam-schedules/attempts/${attemptId}/submit`, {
+    method: 'POST',
+    headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answers }),
+  })
+  if (!res.ok) {
+    const json = (await res.json()) as { message?: string }
+    throw new Error(json?.message ?? 'Failed to submit')
+  }
+}

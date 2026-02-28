@@ -9,6 +9,8 @@ import {
   deleteExamSchedule,
 } from '../exam-schedules-store.js'
 import { isStudentRegistered, addRegistration, removeRegistration } from '../exam-registrations-store.js'
+import { getActiveAttemptByStudent, createAttempt, getAttemptById, submitAttempt } from '../exam-attempts-store.js'
+import { getQuestionsByIds } from '../questions-store.js'
 import type { ExamSchedule, CreateExamScheduleBody, UpdateExamScheduleBody } from '../types/exam-schedule.js'
 
 export const examSchedulesRouter = Router()
@@ -98,6 +100,140 @@ examSchedulesRouter.get('/', (_req, res, next) => {
   try {
     const schedules = getAllExamSchedules()
     res.json({ success: true, schedules })
+  } catch (err) {
+    next(err)
+  }
+})
+
+const DEFAULT_EXAM_DURATION_MINUTES = 60
+
+function getExamEndTime(schedule: ExamSchedule): number {
+  const start = new Date(schedule.scheduledAt).getTime()
+  const durationMs = (schedule.durationMinutes ?? DEFAULT_EXAM_DURATION_MINUTES) * 60 * 1000
+  return start + durationMs
+}
+
+function isExamWindowOpen(schedule: ExamSchedule): boolean {
+  const now = Date.now()
+  const start = new Date(schedule.scheduledAt).getTime()
+  const end = getExamEndTime(schedule)
+  return now >= start && now < end
+}
+
+// Student: get current active attempt (must be before /:id)
+examSchedulesRouter.get('/attempts/current', requireAuth, requireRole('student'), (req, res, next) => {
+  try {
+    const auth = res.locals.auth as AuthLocals
+    const studentId = auth.studentId
+    if (!studentId) {
+      res.status(403).json({ success: false, message: 'Student profile not linked' })
+      return
+    }
+    const attempt = getActiveAttemptByStudent(studentId)
+    if (!attempt) {
+      res.status(404).json({ success: false, message: 'No active attempt' })
+      return
+    }
+    const schedule = getExamScheduleById(attempt.examScheduleId)
+    if (!schedule || !isExamWindowOpen(schedule)) {
+      res.status(404).json({ success: false, message: 'Exam window closed' })
+      return
+    }
+    const questionIds = schedule.questionIds?.length ? schedule.questionIds : []
+    const allQs = questionIds.length ? getQuestionsByIds(questionIds) : []
+    const questions = allQs.map((q) => ({ id: q.id, questionText: q.questionText, options: q.options }))
+    res.json({
+      success: true,
+      attempt: { id: attempt.id, startedAt: attempt.startedAt },
+      schedule: { id: schedule.id, title: schedule.title, durationMinutes: schedule.durationMinutes ?? DEFAULT_EXAM_DURATION_MINUTES },
+      questions,
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Student: start new attempt (body: { scheduleId })
+examSchedulesRouter.post('/attempts/start', requireAuth, requireRole('student'), (req, res, next) => {
+  try {
+    const auth = res.locals.auth as AuthLocals
+    const studentId = auth.studentId
+    if (!studentId) {
+      res.status(403).json({ success: false, message: 'Student profile not linked' })
+      return
+    }
+    const existing = getActiveAttemptByStudent(studentId)
+    if (existing) {
+      res.status(409).json({ success: false, message: 'You already have an active attempt', attemptId: existing.id })
+      return
+    }
+    const scheduleId = (req.body as Record<string, unknown>)?.scheduleId
+    if (typeof scheduleId !== 'string' || !scheduleId) {
+      res.status(400).json({ success: false, message: 'scheduleId is required' })
+      return
+    }
+    const schedule = getExamScheduleById(scheduleId)
+    if (!schedule) {
+      res.status(404).json({ success: false, message: 'Exam schedule not found' })
+      return
+    }
+    if (!isStudentRegistered(schedule.id, studentId)) {
+      res.status(403).json({ success: false, message: 'Not registered for this exam' })
+      return
+    }
+    if (!isExamWindowOpen(schedule)) {
+      res.status(400).json({ success: false, message: 'Exam is not open for attempt at this time' })
+      return
+    }
+    const attempt = createAttempt(schedule.id, studentId)
+    const questionIds = schedule.questionIds?.length ? schedule.questionIds : []
+    const allQs = questionIds.length ? getQuestionsByIds(questionIds) : []
+    const questions = allQs.map((q) => ({ id: q.id, questionText: q.questionText, options: q.options }))
+    res.status(201).json({
+      success: true,
+      attempt: { id: attempt.id, startedAt: attempt.startedAt },
+      schedule: { id: schedule.id, title: schedule.title, durationMinutes: schedule.durationMinutes ?? DEFAULT_EXAM_DURATION_MINUTES },
+      questions,
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Student: submit attempt (body: { answers: Record<questionId, number> })
+examSchedulesRouter.post('/attempts/:attemptId/submit', requireAuth, requireRole('student'), (req, res, next) => {
+  try {
+    const auth = res.locals.auth as AuthLocals
+    const studentId = auth.studentId
+    if (!studentId) {
+      res.status(403).json({ success: false, message: 'Student profile not linked' })
+      return
+    }
+    const attempt = getAttemptById(req.params.attemptId)
+    if (!attempt) {
+      res.status(404).json({ success: false, message: 'Attempt not found' })
+      return
+    }
+    if (attempt.studentId !== studentId) {
+      res.status(403).json({ success: false, message: 'Not your attempt' })
+      return
+    }
+    if (attempt.submittedAt) {
+      res.status(400).json({ success: false, message: 'Attempt already submitted' })
+      return
+    }
+    const body = req.body as Record<string, unknown>
+    const answers = body?.answers
+    if (!answers || typeof answers !== 'object' || Array.isArray(answers)) {
+      res.status(400).json({ success: false, message: 'answers object is required' })
+      return
+    }
+    const normalized: Record<string, number> = {}
+    for (const [qId, val] of Object.entries(answers)) {
+      if (typeof val === 'number' && Number.isInteger(val) && val >= 0) normalized[qId] = val
+    }
+    const updated = submitAttempt(attempt.id, normalized)
+    res.json({ success: true, message: 'Exam submitted', attempt: updated })
   } catch (err) {
     next(err)
   }

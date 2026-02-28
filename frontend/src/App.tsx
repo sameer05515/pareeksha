@@ -10,10 +10,12 @@ import { ChangePasswordPage } from '@/pages/ChangePasswordPage'
 import { QuestionsPage } from '@/pages/QuestionsPage'
 import { ExamSchedulesPage } from '@/pages/ExamSchedulesPage'
 import { UpcomingExamsPage } from '@/pages/UpcomingExamsPage'
+import { ExamAttemptPage } from '@/pages/ExamAttemptPage'
 
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/exam/attempt" element={<ExamAttemptPage />} />
       <Route path="/" element={<Layout />}>
         <Route index element={<HomeRedirect />} />
         <Route path="register" element={<RegisterPage />} />

@@ -74,12 +74,14 @@ async function start() {
   const { initQuestionsStore } = await import('./questions-store.js')
   const { initExamSchedulesStore } = await import('./exam-schedules-store.js')
   const { initExamRegistrationsStore } = await import('./exam-registrations-store.js')
+  const { initExamAttemptsStore } = await import('./exam-attempts-store.js')
   await initStore()
   initUsersStore()
   ensureDefaultAdmin()
   initQuestionsStore()
   initExamSchedulesStore()
   initExamRegistrationsStore()
+  initExamAttemptsStore()
   app.listen(PORT, () => {
     console.log(`🚀 Pareeksha backend running at http://localhost:${PORT}`);
     console.log('🔁 OpenAPI spec: http://localhost:3000/openapi.json');

@@ -31,6 +31,11 @@ export function getQuestionById(id: string): Question | undefined {
   return questions.find((q) => q.id === id)
 }
 
+export function getQuestionsByIds(ids: string[]): Question[] {
+  const set = new Set(ids)
+  return questions.filter((q) => set.has(q.id))
+}
+
 export function addQuestion(question: Question): void {
   questions.push(question)
   try {
