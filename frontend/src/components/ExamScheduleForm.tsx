@@ -152,7 +152,7 @@ export function ExamScheduleForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-[480px]">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-[480px]">
       <h3 className="font-semibold text-accent m-0 tracking-wide">
         {isEdit ? 'Edit exam schedule' : 'Add exam schedule'}
       </h3>
@@ -209,13 +209,13 @@ export function ExamScheduleForm({
               value={questionSearch}
               onChange={(e) => setQuestionSearch(e.target.value)}
               placeholder="Search questions…"
-              className="flex-1 min-w-[220px] py-2 px-3 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
+              className="flex-1 min-w-0 py-2 px-3 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
             />
             <button
               type="button"
               onClick={selectAllVisible}
               disabled={questionsLoading || filteredQuestions.length === 0}
-              className="py-2 px-3 bg-transparent border border-border rounded text-sm text-muted hover:bg-input hover:text-text disabled:opacity-50 disabled:cursor-not-allowed"
+              className="py-2 px-3 min-h-[44px] sm:min-h-0 bg-transparent border border-border rounded text-sm text-muted hover:bg-input hover:text-text disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               Select all
             </button>
@@ -223,7 +223,7 @@ export function ExamScheduleForm({
               type="button"
               onClick={clearSelection}
               disabled={selectedQuestionIds.length === 0}
-              className="py-2 px-3 bg-transparent border border-border rounded text-sm text-muted hover:bg-input hover:text-text disabled:opacity-50 disabled:cursor-not-allowed"
+              className="py-2 px-3 min-h-[44px] sm:min-h-0 bg-transparent border border-border rounded text-sm text-muted hover:bg-input hover:text-text disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               Clear
             </button>

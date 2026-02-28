@@ -23,7 +23,29 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
     ? 'block py-2.5 px-5 text-sm font-medium bg-indigo-500/10 text-accent border-l-[3px] border-accent'
     : 'block py-2.5 px-5 text-sm font-medium text-muted no-underline border-l-[3px] border-transparent transition-colors hover:bg-input hover:text-text'
 
-export function Sidebar() {
+function CloseIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  )
+}
+
+export function Sidebar({
+  open = true,
+  onClose,
+  className = '',
+  overlayClassName = '',
+  showOverlay = false,
+  onOverlayClick,
+}: {
+  open?: boolean
+  onClose?: () => void
+  className?: string
+  overlayClassName?: string
+  showOverlay?: boolean
+  onOverlayClick?: () => void
+} = {}) {
   const { user, isAuthenticated, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
@@ -31,19 +53,50 @@ export function Sidebar() {
   const handleLogout = () => {
     logout()
     navigate('/login')
+    onClose?.()
   }
 
+  const handleNavClick = () => onClose?.()
+
   return (
-    <aside className="w-60 min-h-screen bg-card border-r border-border flex flex-col shrink-0">
+    <>
+      {showOverlay && (
+        <div
+          className={overlayClassName}
+          onClick={onOverlayClick}
+          onKeyDown={(e) => e.key === 'Escape' && onOverlayClick?.()}
+          role="button"
+          tabIndex={0}
+          aria-label="Close menu"
+        />
+      )}
+      <aside
+        className={`${className} ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+        aria-hidden={!open}
+      >
       <div className="py-6 px-5 border-b border-border">
-        <h1 className="text-[1.35rem] font-bold tracking-tight m-0 mb-1 bg-gradient-to-br from-zinc-100 to-zinc-400 bg-clip-text text-transparent sidebar-logo">
-          Pareeksha
-        </h1>
-        <p className="text-xs text-muted m-0">Student Registration</p>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h1 className="text-[1.35rem] font-bold tracking-tight m-0 mb-1 bg-gradient-to-br from-zinc-100 to-zinc-400 bg-clip-text text-transparent sidebar-logo">
+              Pareeksha
+            </h1>
+            <p className="text-xs text-muted m-0">Student Registration</p>
+          </div>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="lg:hidden p-2 -mr-2 rounded-lg text-muted hover:bg-input hover:text-text transition-colors touch-manipulation"
+              aria-label="Close menu"
+            >
+              <CloseIcon className="w-5 h-5" />
+            </button>
+          )}
+        </div>
         <button
           type="button"
           onClick={toggleTheme}
-          className="mt-3 flex items-center gap-2 py-2 px-3 rounded border border-border text-muted text-sm hover:bg-input hover:text-text transition-colors"
+          className="mt-3 flex items-center gap-2 py-2 px-3 rounded border border-border text-muted text-sm hover:bg-input hover:text-text transition-colors touch-manipulation"
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         >
@@ -60,7 +113,7 @@ export function Sidebar() {
           )}
         </button>
       </div>
-      <nav className="py-4 flex flex-col gap-1">
+      <nav className="py-4 flex flex-col gap-1" onClick={handleNavClick}>
         {!isAuthenticated && (
           <>
             <NavLink to="/register" className={linkClass} end>Register</NavLink>
@@ -98,6 +151,7 @@ export function Sidebar() {
           </>
         )}
       </nav>
-    </aside>
+      </aside>
+    </>
   )
 }

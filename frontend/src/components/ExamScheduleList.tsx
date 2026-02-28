@@ -60,7 +60,7 @@ export function ExamScheduleList({
       {schedules.map((s) => (
         <article
           key={s.id}
-          className="flex flex-wrap items-center justify-between gap-3 py-3 px-4 bg-input border border-border rounded"
+          className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3 py-3 px-4 bg-input border border-border rounded"
         >
           <div>
             <h4 className="font-semibold m-0 mb-1 text-text">{s.title}</h4>
@@ -74,13 +74,13 @@ export function ExamScheduleList({
               ) : null}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             {onEdit && (
-              <button
-                type="button"
-                onClick={() => onEdit(s)}
-                className="py-2 px-3 border border-border rounded text-sm text-muted hover:bg-input hover:text-text transition-colors"
-              >
+            <button
+              type="button"
+              onClick={() => onEdit(s)}
+              className="py-2 px-3 min-h-[44px] sm:min-h-0 border border-border rounded text-sm text-muted hover:bg-input hover:text-text transition-colors touch-manipulation"
+            >
                 Edit
               </button>
             )}
@@ -88,7 +88,7 @@ export function ExamScheduleList({
               type="button"
               onClick={() => handleDelete(s.id)}
               disabled={deletingId === s.id}
-              className="py-2 px-3 border border-error rounded text-sm text-error hover:bg-error/10 disabled:opacity-50"
+              className="py-2 px-3 min-h-[44px] sm:min-h-0 border border-error rounded text-sm text-error hover:bg-error/10 disabled:opacity-50 touch-manipulation"
             >
               {deletingId === s.id ? 'Deleting…' : 'Delete'}
             </button>

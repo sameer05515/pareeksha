@@ -45,7 +45,7 @@ export function ExamResultPage() {
         <button
           type="button"
           onClick={() => navigate('/exams')}
-          className="py-2 px-4 bg-accent text-white rounded font-medium"
+          className="min-h-[44px] py-2 px-4 bg-accent text-white rounded font-medium touch-manipulation"
         >
           Back to Upcoming exams
         </button>
@@ -56,8 +56,8 @@ export function ExamResultPage() {
   const pct = data.total > 0 ? Math.round((data.score / data.total) * 100) : 0
 
   return (
-    <div className="min-h-screen bg-base p-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-base p-4 sm:p-6">
+      <div className="max-w-2xl mx-auto w-full">
         <h1 className="font-semibold text-accent m-0 mb-1">{data.schedule.title}</h1>
         <p className="text-sm text-muted m-0 mb-6">Exam result</p>
 

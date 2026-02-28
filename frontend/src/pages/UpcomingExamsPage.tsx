@@ -113,7 +113,7 @@ export function UpcomingExamsPage() {
           <button
             type="button"
             onClick={() => navigate('/exam/attempt')}
-            className="py-2 px-4 bg-accent text-white rounded font-semibold hover:bg-accent-hover"
+            className="py-2 px-4 min-h-[44px] bg-accent text-white rounded font-semibold hover:bg-accent-hover touch-manipulation"
           >
             Continue exam
           </button>
@@ -136,7 +136,7 @@ export function UpcomingExamsPage() {
           {schedules.map((s) => (
             <article
               key={s.id}
-              className="flex flex-wrap items-center justify-between gap-3 py-4 px-4 bg-input border border-border rounded"
+              className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3 py-4 px-4 bg-input border border-border rounded"
             >
               <div>
                 <h3 className="font-semibold m-0 mb-1 text-text">{s.title}</h3>
@@ -150,13 +150,13 @@ export function UpcomingExamsPage() {
                   ) : null}
                 </p>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 {s.registered && isExamActive(s) ? (
                   <button
                     type="button"
                     onClick={() => handleStartExam(s.id)}
                     disabled={startingId === s.id}
-                    className="py-2 px-4 bg-success text-white border-0 rounded text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+                    className="py-2 px-4 min-h-[44px] bg-success text-white border-0 rounded text-sm font-semibold hover:opacity-90 disabled:opacity-50 touch-manipulation"
                   >
                     {startingId === s.id ? 'Starting…' : 'Start exam'}
                   </button>
@@ -166,7 +166,7 @@ export function UpcomingExamsPage() {
                     type="button"
                     onClick={() => handleUnregister(s.id)}
                     disabled={actionId === s.id || isExamActive(s)}
-                    className="py-2 px-4 border border-border rounded text-sm font-medium text-muted hover:bg-input hover:text-text disabled:opacity-50"
+                    className="py-2 px-4 min-h-[44px] border border-border rounded text-sm font-medium text-muted hover:bg-input hover:text-text disabled:opacity-50 touch-manipulation"
                   >
                     {actionId === s.id ? '…' : 'Unregister'}
                   </button>
@@ -175,7 +175,7 @@ export function UpcomingExamsPage() {
                     type="button"
                     onClick={() => handleRegister(s.id)}
                     disabled={actionId === s.id}
-                    className="py-2 px-4 bg-accent text-white border-0 rounded text-sm font-semibold hover:bg-accent-hover disabled:opacity-50"
+                    className="py-2 px-4 min-h-[44px] bg-accent text-white border-0 rounded text-sm font-semibold hover:bg-accent-hover disabled:opacity-50 touch-manipulation"
                   >
                     {actionId === s.id ? '…' : 'Register'}
                   </button>

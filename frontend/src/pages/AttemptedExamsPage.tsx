@@ -59,7 +59,7 @@ export function AttemptedExamsPage() {
           {attempts.map((a) => (
             <article
               key={a.id}
-              className="flex flex-wrap items-center justify-between gap-3 py-4 px-4 bg-input border border-border rounded"
+              className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3 py-4 px-4 bg-input border border-border rounded"
             >
               <div>
                 <h3 className="font-semibold m-0 mb-1 text-text">{a.scheduleTitle}</h3>
@@ -75,7 +75,7 @@ export function AttemptedExamsPage() {
               </div>
               <Link
                 to={`/exam/result/${a.id}`}
-                className="py-2 px-4 bg-accent text-white rounded text-sm font-semibold no-underline hover:bg-accent-hover"
+                className="inline-flex items-center justify-center min-h-[44px] py-2 px-4 bg-accent text-white rounded text-sm font-semibold no-underline hover:bg-accent-hover touch-manipulation w-full sm:w-auto"
               >
                 See result
               </Link>

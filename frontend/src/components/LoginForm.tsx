@@ -31,7 +31,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-[360px]">
       <h2 className="m-0 mb-2 text-xl">Sign in</h2>
       {error && (
         <div className="py-2 px-3 bg-red-500/10 border border-error rounded text-error text-sm" role="alert">
@@ -44,7 +44,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
+          className="w-full min-w-0 py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
           required
           autoComplete="email"
         />
@@ -55,14 +55,14 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
+          className="w-full min-w-0 py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
           required
           autoComplete="current-password"
         />
       </label>
       <button
         type="submit"
-        className="py-3 px-6 bg-accent text-white border-0 rounded font-semibold mt-1 hover:bg-accent-hover disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full min-h-[44px] py-3 px-6 bg-accent text-white border-0 rounded font-semibold mt-1 hover:bg-accent-hover disabled:opacity-60 disabled:cursor-not-allowed touch-manipulation"
         disabled={loading}
       >
         {loading ? 'Signing in…' : 'Sign in'}

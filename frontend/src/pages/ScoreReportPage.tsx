@@ -17,28 +17,28 @@ function formatDateTime(iso: string): string {
 function ReportTable({ rows, title }: { rows: ScoreReportRow[]; title?: string }) {
   if (rows.length === 0) return null
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto -mx-1 sm:mx-0">
       {title && <h4 className="text-sm font-semibold text-accent mb-2">{title}</h4>}
-      <table className="w-full border-collapse text-sm">
+      <table className="w-full min-w-[520px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-border bg-input/50">
-            <th className="text-left py-2.5 px-3 font-semibold text-muted">Rank</th>
-            <th className="text-left py-2.5 px-3 font-semibold text-muted">Name</th>
-            <th className="text-left py-2.5 px-3 font-semibold text-muted">School</th>
-            <th className="text-left py-2.5 px-3 font-semibold text-muted">Location</th>
-            <th className="text-right py-2.5 px-3 font-semibold text-muted">Score</th>
-            <th className="text-left py-2.5 px-3 font-semibold text-muted">Submitted</th>
+            <th className="text-left py-2.5 px-2 sm:px-3 font-semibold text-muted">Rank</th>
+            <th className="text-left py-2.5 px-2 sm:px-3 font-semibold text-muted">Name</th>
+            <th className="text-left py-2.5 px-2 sm:px-3 font-semibold text-muted hidden sm:table-cell">School</th>
+            <th className="text-left py-2.5 px-2 sm:px-3 font-semibold text-muted hidden md:table-cell">Location</th>
+            <th className="text-right py-2.5 px-2 sm:px-3 font-semibold text-muted">Score</th>
+            <th className="text-left py-2.5 px-2 sm:px-3 font-semibold text-muted hidden lg:table-cell">Submitted</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
             <tr key={r.attemptId} className="border-b border-border hover:bg-card">
-              <td className="py-2.5 px-3 font-medium text-text">{r.rank}</td>
-              <td className="py-2.5 px-3 text-text">{r.studentName}</td>
-              <td className="py-2.5 px-3 text-muted max-w-[200px] truncate" title={r.schoolNameAndAddress}>{r.schoolNameAndAddress || '—'}</td>
-              <td className="py-2.5 px-3 text-muted">{[r.city, r.state].filter(Boolean).join(', ') || '—'}</td>
-              <td className="py-2.5 px-3 text-right font-medium text-text">{r.score} / {r.total}</td>
-              <td className="py-2.5 px-3 text-muted">{formatDateTime(r.submittedAt)}</td>
+              <td className="py-2.5 px-2 sm:px-3 font-medium text-text">{r.rank}</td>
+              <td className="py-2.5 px-2 sm:px-3 text-text">{r.studentName}</td>
+              <td className="py-2.5 px-2 sm:px-3 text-muted max-w-[140px] sm:max-w-[200px] truncate hidden sm:table-cell" title={r.schoolNameAndAddress}>{r.schoolNameAndAddress || '—'}</td>
+              <td className="py-2.5 px-2 sm:px-3 text-muted hidden md:table-cell">{[r.city, r.state].filter(Boolean).join(', ') || '—'}</td>
+              <td className="py-2.5 px-2 sm:px-3 text-right font-medium text-text">{r.score} / {r.total}</td>
+              <td className="py-2.5 px-2 sm:px-3 text-muted hidden lg:table-cell">{formatDateTime(r.submittedAt)}</td>
             </tr>
           ))}
         </tbody>
@@ -97,13 +97,13 @@ export function ScoreReportPage() {
         View score and rank for each exam: all locations (combined) and school-wise.
       </p>
 
-      <label className="flex flex-col gap-1.5 text-sm text-muted max-w-md">
+      <label className="flex flex-col gap-1.5 text-sm text-muted max-w-full sm:max-w-md">
         Select exam
         <select
           value={selectedId}
           onChange={(e) => setSelectedId(e.target.value)}
           disabled={loadingSchedules}
-          className="py-2.5 px-3.5 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus"
+          className="py-2.5 px-3.5 w-full sm:w-auto min-w-0 bg-input border border-border rounded text-text focus:outline-none focus:border-border-focus touch-manipulation"
         >
           <option value="">— Select exam —</option>
           {schedules.map((s) => (
@@ -145,7 +145,7 @@ export function ScoreReportPage() {
             ) : (
               <div className="flex flex-col gap-6">
                 {report.schoolWise.map((group, idx) => (
-                  <div key={idx} className="border border-border rounded p-4 bg-card">
+                  <div key={idx} className="border border-border rounded p-3 sm:p-4 bg-card">
                     <div className="mb-3">
                       <p className="font-medium text-text m-0">
                         {group.schoolNameAndAddress || '(No school)'}
