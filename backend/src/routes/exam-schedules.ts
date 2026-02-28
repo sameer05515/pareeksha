@@ -9,7 +9,7 @@ import {
   deleteExamSchedule,
 } from '../exam-schedules-store.js'
 import { isStudentRegistered, addRegistration, removeRegistration } from '../exam-registrations-store.js'
-import { getActiveAttemptByStudent, createAttempt, getAttemptById, submitAttempt } from '../exam-attempts-store.js'
+import { getActiveAttemptByStudent, createAttempt, getAttemptById, submitAttempt, getSubmittedAttemptsByStudent } from '../exam-attempts-store.js'
 import { getQuestionsByIds } from '../questions-store.js'
 import type { ExamSchedule, CreateExamScheduleBody, UpdateExamScheduleBody } from '../types/exam-schedule.js'
 
@@ -234,6 +234,42 @@ examSchedulesRouter.post('/attempts/:attemptId/submit', requireAuth, requireRole
     }
     const updated = submitAttempt(attempt.id, normalized)
     res.json({ success: true, message: 'Exam submitted', attempt: updated })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// Student: list my submitted attempts (must be before /attempts/:attemptId/result)
+examSchedulesRouter.get('/attempts/mine', requireAuth, requireRole('student'), (req, res, next) => {
+  try {
+    const auth = res.locals.auth as AuthLocals
+    const studentId = auth.studentId
+    if (!studentId) {
+      res.status(403).json({ success: false, message: 'Student profile not linked' })
+      return
+    }
+    const submitted = getSubmittedAttemptsByStudent(studentId)
+    const list = submitted.map((attempt) => {
+      const schedule = getExamScheduleById(attempt.examScheduleId)
+      const title = schedule?.title ?? 'Unknown exam'
+      let score = 0
+      let total = 0
+      if (schedule && attempt.answers) {
+        const questionIds = schedule.questionIds?.length ? schedule.questionIds : []
+        const questions = questionIds.length ? getQuestionsByIds(questionIds) : []
+        total = questions.length
+        score = questions.filter((q) => attempt.answers![q.id] === q.correctIndex).length
+      }
+      return {
+        id: attempt.id,
+        examScheduleId: attempt.examScheduleId,
+        scheduleTitle: title,
+        submittedAt: attempt.submittedAt,
+        score,
+        total,
+      }
+    })
+    res.json({ success: true, attempts: list })
   } catch (err) {
     next(err)
   }

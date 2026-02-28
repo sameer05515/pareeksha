@@ -32,6 +32,14 @@ export function getActiveAttemptByStudent(studentId: string): ExamAttempt | unde
   return attempts.find((a) => a.studentId === studentId && !a.submittedAt)
 }
 
+export function getSubmittedAttemptsByStudent(studentId: string): ExamAttempt[] {
+  return attempts.filter((a) => a.studentId === studentId && a.submittedAt).sort((a, b) => {
+    const tA = a.submittedAt ?? ''
+    const tB = b.submittedAt ?? ''
+    return tB.localeCompare(tA) // newest first
+  })
+}
+
 export function createAttempt(examScheduleId: string, studentId: string): ExamAttempt {
   const attempt: ExamAttempt = {
     id: randomUUID(),

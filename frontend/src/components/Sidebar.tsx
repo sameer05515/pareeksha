@@ -79,6 +79,7 @@ export function Sidebar() {
             {user?.role === 'student' && (
               <>
                 <NavLink to="/exams" className={linkClass} end>Upcoming exams</NavLink>
+                <NavLink to="/exams/attempted" className={linkClass} end>Attempted exams</NavLink>
                 <NavLink to="/profile" className={linkClass} end>My profile</NavLink>
               </>
             )}

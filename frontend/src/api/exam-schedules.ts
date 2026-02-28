@@ -194,3 +194,25 @@ export async function getAttemptResult(attemptId: string): Promise<AttemptResult
     results: json.results ?? [],
   }
 }
+
+export interface MyAttemptItem {
+  id: string
+  examScheduleId: string
+  scheduleTitle: string
+  submittedAt: string
+  score: number
+  total: number
+}
+
+/** Student: list my submitted attempts */
+export async function getMyAttempts(): Promise<MyAttemptItem[]> {
+  const res = await fetch(`${API_BASE}/api/exam-schedules/attempts/mine`, {
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) {
+    const err = (await res.json()) as { message?: string }
+    throw new Error(err?.message ?? 'Failed to load attempts')
+  }
+  const json = (await res.json()) as { success: boolean; attempts: MyAttemptItem[] }
+  return json.attempts ?? []
+}
