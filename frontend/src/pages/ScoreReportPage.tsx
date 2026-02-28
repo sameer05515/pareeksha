@@ -130,7 +130,7 @@ export function ScoreReportPage() {
           </div>
 
           <section className="flex flex-col gap-4">
-            <h3 className="text-base font-semibold text-accent m-0">All locations</h3>
+            <h3 className=" font-semibold text-accent m-0">All locations</h3>
             {report.allLocations.length === 0 ? (
               <p className="text-muted">No attempts for this exam yet.</p>
             ) : (
@@ -139,7 +139,7 @@ export function ScoreReportPage() {
           </section>
 
           <section className="flex flex-col gap-4">
-            <h3 className="text-base font-semibold text-accent m-0">School-wise</h3>
+            <h3 className=" font-semibold text-accent m-0">School-wise</h3>
             {report.schoolWise.length === 0 ? (
               <p className="text-muted">No attempts for this exam yet.</p>
             ) : (
