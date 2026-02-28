@@ -121,7 +121,7 @@ export function StudentRegistrationForm() {
 
       {/* Step 1: Basic Details */}
       <div className={step === 0 ? 'flex flex-col gap-4' : 'hidden'}>
-        <h3 className="text-base font-semibold text-accent m-0 mb-1 tracking-wide uppercase">Basic Details</h3>
+        <h3 className=" font-semibold text-accent m-0 mb-1 tracking-wide uppercase">Basic Details</h3>
         <FormSelect
           label="Preferred Language"
           name="preferredLanguage"
@@ -216,7 +216,7 @@ export function StudentRegistrationForm() {
 
       {/* Step 2: School Details */}
       <div className={step === 1 ? 'flex flex-col gap-4' : 'hidden'}>
-        <h3 className="text-base font-semibold text-accent m-0 mb-1 tracking-wide uppercase">School Details</h3>
+        <h3 className=" font-semibold text-accent m-0 mb-1 tracking-wide uppercase">School Details</h3>
         <FormField
           label="School Name & Address"
           name="schoolNameAndAddress"
@@ -257,7 +257,7 @@ export function StudentRegistrationForm() {
 
       {/* Step 3: Address & Contact */}
       <div className={step === 2 ? 'flex flex-col gap-4' : 'hidden'}>
-        <h3 className="text-base font-semibold text-accent m-0 mb-1 tracking-wide uppercase">Address & Contact</h3>
+        <h3 className=" font-semibold text-accent m-0 mb-1 tracking-wide uppercase">Address & Contact</h3>
         <FormField
           label="Address Line 1"
           name="addressLine1"
