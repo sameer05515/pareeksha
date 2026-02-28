@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import {
   getCurrentAttempt,
   submitAttemptAnswers,
+  startAttempt,
   type ActiveAttemptResponse,
   type AttemptQuestion,
 } from '@/api/exam-schedules'
@@ -25,6 +26,7 @@ export function ExamAttemptPage() {
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [reAttempting, setReAttempting] = useState(false)
   const [focusLost, setFocusLost] = useState(false)
   const [remainingMs, setRemainingMs] = useState<number | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -169,16 +171,52 @@ export function ExamAttemptPage() {
   }
 
   if (submitted) {
+    const scheduleId = data?.schedule.id
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-base p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-base p-4">
         <p className="text-success font-semibold text-lg">Exam submitted successfully.</p>
-        <button
-          type="button"
-          onClick={() => navigate('/exams')}
-          className="py-2 px-4 bg-accent text-white rounded font-medium"
-        >
-          Back to Upcoming exams
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/exams')}
+            className="py-2 px-4 bg-transparent border border-border rounded font-medium text-muted hover:bg-input hover:text-text"
+          >
+            Back to Upcoming exams
+          </button>
+          {scheduleId && (
+            <button
+              type="button"
+                onClick={async () => {
+                if (!scheduleId || reAttempting) return
+                setReAttempting(true)
+                autoSubmitDone.current = false
+                try {
+                  await startAttempt(scheduleId)
+                  setSubmitted(false)
+                  setData(null)
+                  loadAttempt()
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Cannot re-attempt')
+                } finally {
+                  setReAttempting(false)
+                }
+              }}
+              disabled={reAttempting}
+              className="py-2 px-4 bg-accent text-white rounded font-medium disabled:opacity-50"
+            >
+              {reAttempting ? 'Starting…' : 'Re-attempt'}
+            </button>
+          )}
+          {data?.attempt.id && (
+            <button
+              type="button"
+              onClick={() => navigate(`/exam/result/${data.attempt.id}`)}
+              className="py-2 px-4 bg-card border border-accent text-accent rounded font-medium hover:bg-accent hover:text-white"
+            >
+              See results
+            </button>
+          )}
+        </div>
       </div>
     )
   }

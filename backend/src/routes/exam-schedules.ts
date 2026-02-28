@@ -239,6 +239,61 @@ examSchedulesRouter.post('/attempts/:attemptId/submit', requireAuth, requireRole
   }
 })
 
+// Student: get attempt result (score + breakdown) for a submitted attempt
+examSchedulesRouter.get('/attempts/:attemptId/result', requireAuth, requireRole('student'), (req, res, next) => {
+  try {
+    const auth = res.locals.auth as AuthLocals
+    const studentId = auth.studentId
+    if (!studentId) {
+      res.status(403).json({ success: false, message: 'Student profile not linked' })
+      return
+    }
+    const attempt = getAttemptById(req.params.attemptId)
+    if (!attempt) {
+      res.status(404).json({ success: false, message: 'Attempt not found' })
+      return
+    }
+    if (attempt.studentId !== studentId) {
+      res.status(403).json({ success: false, message: 'Not your attempt' })
+      return
+    }
+    if (!attempt.submittedAt || !attempt.answers) {
+      res.status(400).json({ success: false, message: 'Attempt not yet submitted' })
+      return
+    }
+    const schedule = getExamScheduleById(attempt.examScheduleId)
+    if (!schedule) {
+      res.status(404).json({ success: false, message: 'Schedule not found' })
+      return
+    }
+    const questionIds = schedule.questionIds?.length ? schedule.questionIds : []
+    const questions = questionIds.length ? getQuestionsByIds(questionIds) : []
+    const results = questions.map((q) => {
+      const selectedIndex = attempt.answers![q.id]
+      const correct = selectedIndex === q.correctIndex
+      return {
+        questionId: q.id,
+        questionText: q.questionText,
+        options: q.options,
+        correctIndex: q.correctIndex,
+        selectedIndex: selectedIndex ?? -1,
+        correct,
+      }
+    })
+    const score = results.filter((r) => r.correct).length
+    res.json({
+      success: true,
+      schedule: { id: schedule.id, title: schedule.title },
+      attempt: { id: attempt.id, submittedAt: attempt.submittedAt },
+      score,
+      total: results.length,
+      results,
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
 // Student: upcoming exam schedules with registration status (must be before /:id)
 // Includes both future exams (scheduledAt > now) and currently active exams (in time window) so "Start exam" stays visible
 examSchedulesRouter.get('/upcoming', requireAuth, requireRole('student'), (req, res, next) => {

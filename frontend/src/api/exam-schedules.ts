@@ -158,3 +158,39 @@ export async function submitAttemptAnswers(attemptId: string, answers: Record<st
     throw new Error(json?.message ?? 'Failed to submit')
   }
 }
+
+export interface AttemptResultItem {
+  questionId: string
+  questionText: string
+  options: string[]
+  correctIndex: number
+  selectedIndex: number
+  correct: boolean
+}
+
+export interface AttemptResultResponse {
+  schedule: { id: string; title: string }
+  attempt: { id: string; submittedAt: string }
+  score: number
+  total: number
+  results: AttemptResultItem[]
+}
+
+/** Student: get attempt result (score + breakdown) */
+export async function getAttemptResult(attemptId: string): Promise<AttemptResultResponse> {
+  const res = await fetch(`${API_BASE}/api/exam-schedules/attempts/${attemptId}/result`, {
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) {
+    const json = (await res.json()) as { message?: string }
+    throw new Error(json?.message ?? 'Failed to load result')
+  }
+  const json = (await res.json()) as { success: boolean } & AttemptResultResponse
+  return {
+    schedule: json.schedule,
+    attempt: json.attempt,
+    score: json.score,
+    total: json.total,
+    results: json.results ?? [],
+  }
+}
